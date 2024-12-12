@@ -21,7 +21,6 @@ import ru.otus.compose.ui.theme.AppTheme
 import com.google.accompanist.glide.rememberGlidePainter
 import ru.otus.compose.R
 
-
 @Composable
 fun DataViewItem(
     dataViewState: DataViewState,

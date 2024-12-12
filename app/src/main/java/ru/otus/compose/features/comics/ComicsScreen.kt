@@ -22,7 +22,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.ComicsWrapperDto
+import ru.otus.compose.data.dto.ComicsDataDto
 import ru.otus.compose.ui.common.DataViewItem
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
@@ -31,7 +31,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
-import ru.otus.compose.data.dto.comicsinfo.toDataViewState
+import ru.otus.compose.data.dto.toDataViewState
 
 @Composable
 fun ComicsScreen(
@@ -110,7 +110,7 @@ fun ComicsList(
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val comicsInfo =
-        remember { mutableStateOf<GreatResult<ComicsWrapperDto>>(GreatResult.Progress) }
+        remember { mutableStateOf<GreatResult<ComicsDataDto>>(GreatResult.Progress) }
 
     LaunchedEffect(true) {
         val info = viewModel.fetchComicsInfoById(comicsId)
@@ -155,7 +155,7 @@ fun ComicsList(
 
 @Composable
 fun Comics(
-    comicsWrapper: ComicsWrapperDto,
+    comicsWrapper: ComicsDataDto,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {

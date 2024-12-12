@@ -2,8 +2,8 @@ package ru.otus.compose.data.repository
 
 import ru.otus.compose.data.HeroService
 import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.comicsinfo.ComicsDto
-import ru.otus.compose.data.dto.ComicsWrapperDto
+import ru.otus.compose.data.dto.ComicsDataDto.ComicsDto
+import ru.otus.compose.data.dto.ComicsDataDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +18,7 @@ class ComicsRepository @Inject constructor(
         )
     }
 
-    suspend fun loadComicsById(id: String): GreatResult<ComicsWrapperDto> {
+    suspend fun loadComicsById(id: String): GreatResult<ComicsDataDto> {
         return GreatResult.Success(service.getComicsInfoById(id).info)
     }
 }
