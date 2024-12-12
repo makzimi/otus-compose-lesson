@@ -72,7 +72,7 @@ dependencies {
 
     // Hilt Jetpack components
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.lifecycle.viewmodel)
+    //implementation(libs.androidx.hilt.lifecycle.viewmodel)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
