@@ -4,7 +4,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.otus.compose.data.dto.comicsinfo.ComicsWrapperResponse
-import ru.otus.compose.data.dto.heroinfo.HeroInfoResponse
+import ru.otus.compose.data.dto.heroinfo.HeroInfoResponseDto
 import ru.otus.compose.data.dto.heroinfo.HeroesResponseDto
 
 interface HeroService {
@@ -15,7 +15,7 @@ interface HeroService {
     ): HeroesResponseDto
 
     @GET("v1/public/characters/{characterId}")
-    suspend fun getHeroInfo(@Path("characterId") heroId: Long): HeroInfoResponse
+    suspend fun getHeroInfo(@Path("characterId") heroId: Long): HeroInfoResponseDto
 
     @GET("v1/public/characters/{comicsId}/comics")
     suspend fun getComicsInfoById(@Path("comicsId") comicsId: String): ComicsWrapperResponse

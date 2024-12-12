@@ -1,10 +1,22 @@
 package ru.otus.compose.data.dto.heroinfo
 
-import ru.otus.compose.data.dto.ThumbNailDto
-import ru.otus.compose.data.dto.getImageUrl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.otus.compose.data.dto.ThumbNailDto
+import ru.otus.compose.data.dto.getImageUrl
 import ru.otus.compose.ui.common.DataViewState
+
+@Serializable
+data class HeroInfoResponseDto(
+    @SerialName("data")
+    val info: HeroInfoWrapperDto
+)
+
+@Serializable
+data class HeroInfoWrapperDto(
+    @SerialName("results")
+    val results: List<HeroInfoDto>
+)
 
 @Serializable
 data class HeroInfoDto(
@@ -16,7 +28,13 @@ data class HeroInfoDto(
     val thumbnail: ThumbNailDto,
     @SerialName("comics")
     val comicsDto: ComicsDto
-)
+) {
+    @Serializable
+    data class ComicsDto(
+        @SerialName("collectionURI")
+        val collectionUri: String
+    )
+}
 
 fun HeroInfoDto.toDataViewModel(navigationUrl: String): DataViewState {
     return DataViewState(
