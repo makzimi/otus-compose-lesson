@@ -4,8 +4,8 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.ComicsDataDto.ComicsDto
-import ru.otus.compose.data.dto.ComicsDataDto
+import ru.otus.compose.data.dto.ComicsListDto.ComicsDto
+import ru.otus.compose.data.dto.ComicsListDto
 import ru.otus.compose.data.repository.ComicsRepository
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ class ComicsViewModel @Inject constructor(
         }
     }
 
-    suspend fun fetchComicsInfoById(id: String): GreatResult<ComicsDataDto> {
+    suspend fun fetchComicsInfoById(id: String): GreatResult<ComicsListDto> {
         return try {
             comicsRepository.loadComicsById(id)
         } catch (exception: Exception) {

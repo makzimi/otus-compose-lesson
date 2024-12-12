@@ -22,7 +22,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.ComicsDataDto
+import ru.otus.compose.data.dto.ComicsListDto
 import ru.otus.compose.ui.common.DataViewItem
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
@@ -110,7 +110,7 @@ fun ComicsList(
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val comicsInfo =
-        remember { mutableStateOf<GreatResult<ComicsDataDto>>(GreatResult.Progress) }
+        remember { mutableStateOf<GreatResult<ComicsListDto>>(GreatResult.Progress) }
 
     LaunchedEffect(true) {
         val info = viewModel.fetchComicsInfoById(comicsId)
@@ -155,7 +155,7 @@ fun ComicsList(
 
 @Composable
 fun Comics(
-    comicsWrapper: ComicsDataDto,
+    comicsWrapper: ComicsListDto,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {

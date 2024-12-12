@@ -32,7 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.ComicsDataDto.ComicsDto
+import ru.otus.compose.data.dto.ComicsListDto.ComicsDto
 import ru.otus.compose.data.dto.getImageUrl
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView

@@ -2,17 +2,17 @@ package ru.otus.compose.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.otus.compose.data.dto.ComicsDataDto.ComicsDto
+import ru.otus.compose.data.dto.ComicsListDto.ComicsDto
 import ru.otus.compose.ui.common.DataViewState
 
 @Serializable
-data class ComicsWrapperResponseDto(
+data class ComicsResponseDto(
     @SerialName("data")
-    val info: ComicsDataDto
+    val info: ComicsListDto
 )
 
 @Serializable
-data class ComicsDataDto(
+data class ComicsListDto(
     @SerialName("results")
     val results: List<ComicsDto>
 ) {
