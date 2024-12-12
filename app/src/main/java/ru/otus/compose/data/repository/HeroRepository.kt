@@ -1,9 +1,9 @@
 package ru.otus.compose.data.repository
 
 import ru.otus.compose.data.HeroService
-import ru.otus.compose.data.dto.GreatResult
-import ru.otus.compose.data.dto.heroinfo.HeroInfoDto
-import ru.otus.compose.data.dto.heroinfo.HeroesResponseDto
+import ru.otus.compose.data.GreatResult
+import ru.otus.compose.data.dto.HeroInfoDto
+import ru.otus.compose.data.dto.HeroesResponseDto
 import javax.inject.Inject
 import javax.inject.Singleton
 

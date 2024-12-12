@@ -3,9 +3,9 @@ package ru.otus.compose.data.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.otus.compose.data.repository.HeroRepository
-import ru.otus.compose.data.dto.heroinfo.HeroDto
+import ru.otus.compose.data.dto.HeroDto
 
-class HeroDataSource constructor(
+class HeroDataSource(
     private val repository: HeroRepository
 ) : PagingSource<Int, HeroDto>() {
 
@@ -24,7 +24,7 @@ class HeroDataSource constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, HeroDto>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, HeroDto>): Int {
         return 0
     }
 }

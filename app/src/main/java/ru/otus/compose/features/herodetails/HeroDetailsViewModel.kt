@@ -3,8 +3,8 @@ package ru.otus.compose.features.herodetails
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ru.otus.compose.data.dto.GreatResult
-import ru.otus.compose.data.dto.heroinfo.HeroInfoDto
+import ru.otus.compose.data.GreatResult
+import ru.otus.compose.data.dto.HeroInfoDto
 import ru.otus.compose.data.repository.HeroRepository
 import javax.inject.Inject
 

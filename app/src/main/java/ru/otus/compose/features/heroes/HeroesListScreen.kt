@@ -32,9 +32,9 @@ import ru.otus.compose.ui.common.LoadingItem
 import ru.otus.compose.ui.common.LoadingView
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import ru.otus.compose.data.dto.heroinfo.HeroDto
+import ru.otus.compose.data.dto.HeroDto
 import ru.otus.compose.ui.theme.AppTheme
-import ru.otus.compose.data.dto.heroinfo.toDataView
+import ru.otus.compose.data.dto.toDataView
 
 @Composable
 fun HeroesListScreen(

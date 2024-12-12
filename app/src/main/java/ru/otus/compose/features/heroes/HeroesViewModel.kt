@@ -9,7 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import ru.otus.compose.data.dto.heroinfo.HeroDto
+import ru.otus.compose.data.dto.HeroDto
 import ru.otus.compose.data.repository.HeroRepository
 import ru.otus.compose.data.source.HeroDataSource
 import javax.inject.Inject

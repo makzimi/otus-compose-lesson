@@ -43,9 +43,9 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.R
-import ru.otus.compose.data.dto.GreatResult
+import ru.otus.compose.data.GreatResult
 import ru.otus.compose.data.dto.getImageUrl
-import ru.otus.compose.data.dto.heroinfo.HeroInfoDto
+import ru.otus.compose.data.dto.HeroInfoDto
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme

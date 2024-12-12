@@ -3,9 +3,9 @@ package ru.otus.compose.features.comics
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ru.otus.compose.data.dto.GreatResult
+import ru.otus.compose.data.GreatResult
 import ru.otus.compose.data.dto.comicsinfo.ComicsDto
-import ru.otus.compose.data.dto.comicsinfo.ComicsWrapperDto
+import ru.otus.compose.data.dto.ComicsWrapperDto
 import ru.otus.compose.data.repository.ComicsRepository
 import javax.inject.Inject
 

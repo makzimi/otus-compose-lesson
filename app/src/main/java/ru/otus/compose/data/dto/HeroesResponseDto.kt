@@ -1,9 +1,7 @@
-package ru.otus.compose.data.dto.heroinfo
+package ru.otus.compose.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.otus.compose.data.dto.ThumbNailDto
-import ru.otus.compose.data.dto.getImageUrl
 import ru.otus.compose.ui.common.DataViewState
 
 @Serializable
