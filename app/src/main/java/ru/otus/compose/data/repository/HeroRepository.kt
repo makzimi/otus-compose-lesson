@@ -3,7 +3,7 @@ package ru.otus.compose.data.repository
 import ru.otus.compose.data.HeroService
 import ru.otus.compose.data.dto.GreatResult
 import ru.otus.compose.data.dto.heroinfo.HeroInfoDto
-import ru.otus.compose.data.dto.heroinfo.HeroResponseDto
+import ru.otus.compose.data.dto.heroinfo.HeroesResponseDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,8 +12,8 @@ class HeroRepository @Inject constructor(
     private val heroService: HeroService
 ) {
 
-    suspend fun loadHeroes(offset: Int, limit: Int): HeroResponseDto {
-        return heroService.getHeroesAsync(offset = offset, limit = limit)
+    suspend fun loadHeroes(offset: Int, limit: Int): HeroesResponseDto {
+        return heroService.getHeroes(offset = offset, limit = limit)
     }
 
     suspend fun loadHeroInfoById(heroId: Long): GreatResult<HeroInfoDto> {

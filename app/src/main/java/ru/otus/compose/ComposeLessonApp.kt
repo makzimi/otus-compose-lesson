@@ -15,11 +15,13 @@ import ru.otus.compose.ui.SplashScreen
 import ru.otus.compose.ui.theme.AppTheme
 import ru.otus.compose.ui.theme.ComposeLessonTheme
 
-typealias ThemeToggle = () -> Unit
+typealias OnThemeToggle = () -> Unit
 
 @Composable
-fun ComposeLessonApp(onToggleTheme: () -> Unit, darkTheme: Boolean) {
-
+fun ComposeLessonApp(
+    onToggleTheme: () -> Unit,
+    darkTheme: Boolean,
+) {
     ComposeLessonTheme(darkTheme = darkTheme) {
         Surface(color = AppTheme.colors.background) {
             val navController = rememberNavController()
@@ -28,7 +30,10 @@ fun ComposeLessonApp(onToggleTheme: () -> Unit, darkTheme: Boolean) {
                     SplashScreen(navHostController = navController)
                 }
                 composable("heroesList") {
-                    HeroesListScreen(navHostController = navController, onToggleTheme = onToggleTheme)
+                    HeroesListScreen(
+                        navHostController = navController,
+                        onToggleTheme = onToggleTheme
+                    )
                 }
                 composable(
                     "comicsInfo/{comicsId}",

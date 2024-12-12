@@ -3,13 +3,13 @@ package ru.otus.compose.data.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.otus.compose.data.repository.HeroRepository
-import ru.otus.compose.data.dto.heroinfo.HeroResponse
+import ru.otus.compose.data.dto.heroinfo.HeroDto
 
 class HeroDataSource constructor(
     private val repository: HeroRepository
-) : PagingSource<Int, HeroResponse>() {
+) : PagingSource<Int, HeroDto>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, HeroResponse> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, HeroDto> {
         return try {
             val offset = params.key ?: 0
             val movieListResponse = repository.loadHeroes(offset, 20)
@@ -24,7 +24,7 @@ class HeroDataSource constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, HeroResponse>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, HeroDto>): Int? {
         return 0
     }
 }

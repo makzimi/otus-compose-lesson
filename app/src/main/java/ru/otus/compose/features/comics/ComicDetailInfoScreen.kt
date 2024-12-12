@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -38,75 +40,103 @@ import ru.otus.compose.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComicDetailInfoScreen(
+private fun ComicDetailInfoTopBar(
     navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        modifier = modifier.fillMaxWidth(),
+        colors = topAppBarColors(containerColor = AppTheme.colors.toolbar),
+        title = {
+            Text(
+                text = "Back to others",
+                style = AppTheme.typography.textMediumBold,
+                color = AppTheme.colors.text
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = { navHostController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    tint = AppTheme.colors.iconColor,
+                    contentDescription = null
+                )
+            }
+        },
+    )
+}
+
+@Composable
+fun ComicDetailInfoScreen(
+    comicsId: String,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
     viewModel: ComicsViewModel = hiltViewModel(),
-    comicsId: String
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Back to others",
-                        style = AppTheme.typography.textMediumBold,
-                        color = AppTheme.colors.text
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navHostController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            tint = AppTheme.colors.iconColor,
-                            contentDescription = null
-                        )
-                    }
-                },
-                //backgroundColor = AppTheme.colors.toolbar
+            ComicDetailInfoTopBar(
+                navHostController = navHostController,
+                modifier.fillMaxWidth(),
             )
         },
         content = { innerPadding ->
-            val modifier = Modifier.padding(innerPadding)
-            val coroutineScope = rememberCoroutineScope()
-            val swipeRefreshState = rememberSwipeRefreshState(false)
-            val comicsInfo =
-                remember { mutableStateOf<GreatResult<ComicsDto>>(GreatResult.Progress) }
+            ComicDetailInfo(
+                comicsId = comicsId,
+                navHostController = navHostController,
+                modifier = Modifier.padding(innerPadding),
+                viewModel = viewModel,
+            )
+        }
+    )
+}
 
-            LaunchedEffect(Unit) {
-                val info = viewModel.fetchComicDetailInfo(comicsId)
-                comicsInfo.value = info
+@Composable
+private fun ComicDetailInfo(
+    comicsId: String,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+    viewModel: ComicsViewModel = hiltViewModel(),
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val swipeRefreshState = rememberSwipeRefreshState(false)
+    val comicsInfo =
+        remember { mutableStateOf<GreatResult<ComicsDto>>(GreatResult.Progress) }
+
+    LaunchedEffect(Unit) {
+        val info = viewModel.fetchComicDetailInfo(comicsId)
+        comicsInfo.value = info
+    }
+
+    SwipeRefresh(
+        modifier = modifier,
+        state = swipeRefreshState,
+        onRefresh = {
+            coroutineScope.launch {
+                swipeRefreshState.isRefreshing = true
+                comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
+                swipeRefreshState.isRefreshing = false
             }
+        }
+    ) {
+        when (val comicsInfoDto = comicsInfo.value) {
+            is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
+            is GreatResult.Success -> ComicsInfoContent(
+                comicsDto = comicsInfoDto.data,
+                navHostController = navHostController
+            )
 
-            SwipeRefresh(
-                modifier = modifier,
-                state = swipeRefreshState,
-                onRefresh = {
-                    coroutineScope.launch {
-                        swipeRefreshState.isRefreshing = true
-                        comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
-                        swipeRefreshState.isRefreshing = false
-                    }
-                }
+            is GreatResult.Error -> ErrorItem(
+                message = comicsInfoDto.exception.message.toString(),
+                modifier = Modifier.fillMaxSize()
             ) {
-                when (val comicsInfoDto = comicsInfo.value) {
-                    is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
-                    is GreatResult.Success -> ComicsInfoContent(
-                        comicsDto = comicsInfoDto.data,
-                        navHostController = navHostController
-                    )
-                    is GreatResult.Error -> ErrorItem(
-                        message = comicsInfoDto.exception.message.toString(),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        coroutineScope.launch {
-                            comicsInfo.value = GreatResult.Progress
-                            comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
-                        }
-                    }
+                coroutineScope.launch {
+                    comicsInfo.value = GreatResult.Progress
+                    comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
                 }
             }
         }
-    )
+    }
 }
 
 @Composable

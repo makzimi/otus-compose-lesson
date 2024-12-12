@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -49,72 +50,98 @@ import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeroDetailScreen(
     navHostController: NavHostController,
+    heroId: Long,
     heroDetailsViewModel: HeroDetailsViewModel = hiltViewModel(),
-    heroId: Long
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Back to others",
-                        style = AppTheme.typography.textMediumBold,
-                        color = AppTheme.colors.text
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navHostController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            tint = AppTheme.colors.iconColor,
-                            contentDescription = null
-                        )
-                    }
-                },
+            HeroDetailTopBar(
+                navHostController = navHostController,
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         content = { innerPadding ->
-            val modifier = Modifier.padding(innerPadding)
-            val coroutineScope = rememberCoroutineScope()
-            val swipeRefreshState = rememberSwipeRefreshState(false)
+            HeroDetailContent(
+                heroId = heroId,
+                navHostController = navHostController,
+                heroDetailsViewModel = heroDetailsViewModel,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    )
+}
 
-            val heroInfo: State<GreatResult<HeroInfoDto>> = getState(heroDetailsViewModel, heroId)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HeroDetailTopBar(
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        modifier = modifier,
+        colors = topAppBarColors(containerColor = AppTheme.colors.toolbar),
+        title = {
+            Text(
+                text = "Back to others",
+                style = AppTheme.typography.textMediumBold,
+                color = AppTheme.colors.text
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = { navHostController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    tint = AppTheme.colors.iconColor,
+                    contentDescription = null
+                )
+            }
+        },
+    )
+}
 
-            SwipeRefresh(
-                modifier = modifier,
-                state = swipeRefreshState,
-                onRefresh = {
-                    coroutineScope.launch {
-                        swipeRefreshState.isRefreshing = true
-                        heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
-                        swipeRefreshState.isRefreshing = false
-                    }
-                }
+@Composable
+fun HeroDetailContent(
+    heroId: Long,
+    navHostController: NavHostController,
+    heroDetailsViewModel: HeroDetailsViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val swipeRefreshState = rememberSwipeRefreshState(false)
+    val heroInfo: State<GreatResult<HeroInfoDto>> = getState(heroDetailsViewModel, heroId)
+
+    SwipeRefresh(
+        modifier = modifier,
+        state = swipeRefreshState,
+        onRefresh = {
+            coroutineScope.launch {
+                swipeRefreshState.isRefreshing = true
+                heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
+                swipeRefreshState.isRefreshing = false
+            }
+        }
+    ) {
+        when (val heroInfoResult = heroInfo.value) {
+            is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
+            is GreatResult.Success -> HeroInfoContent(
+                heroInfoDto = heroInfoResult.data,
+                navHostController = navHostController
+            )
+
+            is GreatResult.Error -> ErrorItem(
+                message = heroInfoResult.exception.message.toString(),
+                modifier = Modifier.fillMaxSize()
             ) {
-                when (val heroInfoResult = heroInfo.value) {
-                    is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
-                    is GreatResult.Success -> HeroInfoContent(
-                        heroInfoDto = heroInfoResult.data,
-                        navHostController = navHostController
-                    )
-
-                    is GreatResult.Error -> ErrorItem(
-                        message = heroInfoResult.exception.message.toString(),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        coroutineScope.launch {
-                            heroInfo.unsafeMutable().value = GreatResult.Progress
-                            heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
-                        }
-                    }
+                coroutineScope.launch {
+                    heroInfo.unsafeMutable().value = GreatResult.Progress
+                    heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
                 }
             }
         }
-    )
+    }
 }
 
 inline fun <reified T> State<T>.unsafeMutable(): MutableState<T> {
@@ -134,8 +161,8 @@ private fun getState(
 @Composable
 fun HeroInfoContent(
     heroInfoDto: HeroInfoDto,
+    navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController
 ) {
     Column(
         modifier = modifier
@@ -211,7 +238,7 @@ fun BigHeroImage(url: String) {
                 requestBuilder = { placeholder(R.drawable.default_image) }
             ),
             contentDescription = stringResource(R.string.hero_image_description),
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
     }

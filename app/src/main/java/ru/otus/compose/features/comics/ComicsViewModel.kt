@@ -10,8 +10,7 @@ import ru.otus.compose.data.repository.ComicsRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class ComicsViewModel
-@Inject constructor(
+class ComicsViewModel @Inject constructor(
     private val comicsRepository: ComicsRepository
 ) : ViewModel(), LifecycleObserver {
 

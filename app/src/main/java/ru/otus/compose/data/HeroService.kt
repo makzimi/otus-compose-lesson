@@ -5,14 +5,14 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.otus.compose.data.dto.comicsinfo.ComicsWrapperResponse
 import ru.otus.compose.data.dto.heroinfo.HeroInfoResponse
-import ru.otus.compose.data.dto.heroinfo.HeroResponseDto
+import ru.otus.compose.data.dto.heroinfo.HeroesResponseDto
 
 interface HeroService {
     @GET("v1/public/characters")
-    suspend fun getHeroesAsync(
+    suspend fun getHeroes(
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
-    ): HeroResponseDto
+    ): HeroesResponseDto
 
     @GET("v1/public/characters/{characterId}")
     suspend fun getHeroInfo(@Path("characterId") heroId: Long): HeroInfoResponse
