@@ -1,11 +1,11 @@
-package ru.otus.compose.data.source
+package ru.otus.compose.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.otus.compose.data.repository.HeroRepository
 import ru.otus.compose.data.dto.HeroDto
 
-class HeroDataSource(
+class HeroPagingSource(
     private val repository: HeroRepository
 ) : PagingSource<Int, HeroDto>() {
 
