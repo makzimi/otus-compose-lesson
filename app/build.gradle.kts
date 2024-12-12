@@ -2,14 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "ru.orus.compose"
+    namespace = "ru.otus.compose"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "ru.orus.compose"
+        applicationId = "ru.otus.compose"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -49,11 +52,54 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Navigation and UI
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.constraintlayout.compose)
+
+    // Retrofit and networking
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.jakewharton.coroutines.adapter)
+    implementation(libs.squareup.logging.interceptor)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+
+    // Dagger Hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+
+    // Hilt Jetpack components
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
+
+    // Image loading
+    implementation(libs.bumptech.glide)
+    ksp(libs.glide.compiler)
+    implementation(libs.accompanist.glide)
+    implementation(libs.accompanist.glide.legacy)
+    implementation(libs.coil)
+    implementation(libs.accompanist.coil)
+
+    // Swipe to refresh
+    implementation(libs.accompanist.swiperefresh)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

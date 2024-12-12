@@ -1,4 +1,4 @@
-package ru.orus.compose
+package ru.otus.compose
 
 import org.junit.Test
 
