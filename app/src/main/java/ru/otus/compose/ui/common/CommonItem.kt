@@ -32,11 +32,12 @@ data class CommonItemState(
 @Composable
 fun CommonItem(
     state: CommonItemState,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .background(color = AppTheme.colors.card)
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .clickable(onClick = { navHostController.navigate(state.navigationLink) })
@@ -62,7 +63,10 @@ fun CommonItem(
 }
 
 @Composable
-private fun ItemImage(imageUrl: String) {
+private fun ItemImage(
+    imageUrl: String,
+    modifier: Modifier = Modifier,
+) {
     Image(
         painter = rememberGlidePainter(
             request = imageUrl,
@@ -72,7 +76,7 @@ private fun ItemImage(imageUrl: String) {
         ),
         contentDescription = stringResource(R.string.hero_image_description),
         contentScale = ContentScale.Crop,
-        modifier = Modifier
+        modifier = modifier
             .height(120.dp)
             .width(120.dp)
             .padding(start = 16.dp)
