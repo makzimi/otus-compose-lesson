@@ -5,7 +5,7 @@ import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 import androidx.compose.ui.graphics.vector.ImageVector
 
-public val Icons.Rounded.BrightnessMedium: ImageVector
+val Icons.Rounded.BrightnessMedium: ImageVector
     get() {
         if (_brightnessMedium != null) {
             return _brightnessMedium!!

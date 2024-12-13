@@ -157,7 +157,7 @@ fun Comics(
         items(state.comics) { comicState ->
             CommonItem(
                 navHostController = navHostController,
-                state = comicState.toCommonItemState()
+                state = comicState.toCommonItemState(),
             )
         }
     }
