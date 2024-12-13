@@ -2,7 +2,6 @@ package ru.otus.compose.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.otus.compose.ui.common.DataViewState
 
 @Serializable
 data class ComicDataWrapperDto(
@@ -29,13 +28,3 @@ data class ComicDto(
     @SerialName("thumbnail")
     val thumbnail: ThumbNailDto
 )
-
-fun ComicDto.toDataViewState(navLink: String): DataViewState {
-    return DataViewState(
-        title = title,
-        imageUrl = thumbnail.getImageUrl(),
-        navigationLink = navLink
-    )
-}
-
-

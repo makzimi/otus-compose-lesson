@@ -1,4 +1,4 @@
-package ru.otus.compose.features.heroes
+package ru.otus.compose.features.characters
 
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
@@ -20,9 +20,9 @@ class CharactersViewModel
     private var charactersRepository: CharactersRepository
 ) : ViewModel(), LifecycleObserver {
 
-    val characters: Flow<PagingData<Character>> = Pager(
-        PagingConfig(pageSize = 20)
-    ) {
+    val characters: Flow<PagingData<Character>> = Pager(PagingConfig(pageSize = 20)) {
         CharactersPagingSource(charactersRepository)
-    }.flow.cachedIn(viewModelScope)
+    }
+        .flow
+        .cachedIn(viewModelScope)
 }

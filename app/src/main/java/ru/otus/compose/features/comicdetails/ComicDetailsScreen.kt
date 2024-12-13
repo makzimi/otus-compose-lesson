@@ -1,4 +1,4 @@
-package ru.otus.compose.features.comics
+package ru.otus.compose.features.comicdetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,45 +37,16 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.R
-import ru.otus.compose.common.resolve
-import ru.otus.compose.data.model.Comic
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
 
-sealed interface ComicDetailsState {
-    data object Loading: ComicDetailsState
-    data class Error(val throwable: Throwable): ComicDetailsState
-    data class Data(
-        val id: String,
-        val title: String,
-        val description: String?,
-        val imageUrl: String,
-    ): ComicDetailsState
-}
-
-fun Comic.toDetailsState(): ComicDetailsState.Data {
-    return ComicDetailsState.Data(
-        id = id,
-        title = title,
-        description = description,
-        imageUrl = imageUrl,
-    )
-}
-
-private suspend fun ComicsViewModel.fetchComicDetailsAsState(comicId: String): ComicDetailsState {
-    return fetchComicDetails(comicId = comicId).resolve(
-        onSuccess = { comic -> comic.toDetailsState() },
-        onError = { throwable -> ComicDetailsState.Error(throwable) }
-    )
-}
-
 @Composable
-fun ComicDetailInfoScreen(
+fun ComicDetailsScreen(
     comicsId: String,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: ComicsViewModel = hiltViewModel(),
+    viewModel: ComicDetailsViewModel = hiltViewModel(),
 ) {
     Scaffold(
         topBar = {
@@ -126,14 +97,14 @@ private fun ComicDetailInfoTopBar(
 private fun ComicDetailInfo(
     comicsId: String,
     modifier: Modifier = Modifier,
-    viewModel: ComicsViewModel = hiltViewModel(),
+    viewModel: ComicDetailsViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val state = remember { mutableStateOf<ComicDetailsState>(ComicDetailsState.Loading) }
 
     LaunchedEffect(Unit) {
-        state.value = viewModel.fetchComicDetailsAsState(comicsId)
+        state.value = viewModel.fetchComicDetails(comicsId)
     }
 
     SwipeRefresh(
@@ -142,7 +113,7 @@ private fun ComicDetailInfo(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                state.value = viewModel.fetchComicDetailsAsState(comicsId)
+                state.value = viewModel.fetchComicDetails(comicsId)
                 swipeRefreshState.isRefreshing = false
             }
         }
@@ -159,7 +130,7 @@ private fun ComicDetailInfo(
             ) {
                 coroutineScope.launch {
                     state.value = ComicDetailsState.Loading
-                    state.value = viewModel.fetchComicDetailsAsState(comicsId)
+                    state.value = viewModel.fetchComicDetails(comicsId)
                 }
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,9 +22,16 @@ import ru.otus.compose.ui.theme.AppTheme
 import com.google.accompanist.glide.rememberGlidePainter
 import ru.otus.compose.R
 
+@Immutable
+data class CommonItemState(
+    val title: String,
+    val imageUrl: String,
+    val navigationLink: String
+)
+
 @Composable
-fun DataViewItem(
-    dataViewState: DataViewState,
+fun CommonItem(
+    state: CommonItemState,
     navHostController: NavHostController
 ) {
     Card(
@@ -31,7 +39,7 @@ fun DataViewItem(
         modifier = Modifier
             .background(color = AppTheme.colors.card)
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .clickable(onClick = { navHostController.navigate(dataViewState.navigationLink) })
+            .clickable(onClick = { navHostController.navigate(state.navigationLink) })
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
@@ -42,19 +50,19 @@ fun DataViewItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DataViewTitle(
-                title = dataViewState.title,
+            ItemTitle(
+                title = state.title,
                 modifier = Modifier.weight(1f)
             )
-            DataViewImage(
-                imageUrl = dataViewState.imageUrl
+            ItemImage(
+                imageUrl = state.imageUrl
             )
         }
     }
 }
 
 @Composable
-fun DataViewImage(imageUrl: String) {
+private fun ItemImage(imageUrl: String) {
     Image(
         painter = rememberGlidePainter(
             request = imageUrl,
@@ -73,7 +81,7 @@ fun DataViewImage(imageUrl: String) {
 }
 
 @Composable
-fun DataViewTitle(
+private fun ItemTitle(
     title: String,
     modifier: Modifier = Modifier
 ) {

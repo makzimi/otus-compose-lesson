@@ -1,4 +1,4 @@
-package ru.otus.compose.features.comics
+package ru.otus.compose.features.comicdetails
 
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
@@ -9,25 +9,21 @@ import ru.otus.compose.data.repository.ComicsRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class ComicsViewModel @Inject constructor(
+class ComicDetailsViewModel @Inject constructor(
     private val comicsRepository: ComicsRepository
 ) : ViewModel(), LifecycleObserver {
 
-    suspend fun fetchComicsForCharacter(characterId: String): ComicsState {
-        val result = comicsRepository.loadComicsForCharacter(characterId)
+    suspend fun fetchComicDetails(comicId: String): ComicDetailsState {
+        val result = comicsRepository.loadComicDetails(comicId)
 
         return result.resolve(
-            onSuccess = { comics ->
-                ComicsState.Data(
-                    comics = comics.map { comic -> comic.toState() }
-                )
-            },
-            onError = { throwable -> ComicsState.Error(throwable) }
+            onSuccess = { comic -> comic.toDetailsState() },
+            onError = { throwable -> ComicDetailsState.Error(throwable) }
         )
     }
 
-    private fun Comic.toState(): ComicsState.Data.ComicState {
-        return ComicsState.Data.ComicState(
+    private fun Comic.toDetailsState(): ComicDetailsState.Data {
+        return ComicDetailsState.Data(
             id = id,
             title = title,
             description = description,

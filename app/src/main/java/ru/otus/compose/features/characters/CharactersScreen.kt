@@ -1,4 +1,4 @@
-package ru.otus.compose.features.heroes
+package ru.otus.compose.features.characters
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -26,7 +26,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import ru.otus.compose.OnThemeToggle
 import ru.otus.compose.ui.common.BrightnessMedium
-import ru.otus.compose.ui.common.DataViewItem
+import ru.otus.compose.ui.common.CommonItem
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingItem
 import ru.otus.compose.ui.common.LoadingView
@@ -34,7 +34,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ru.otus.compose.data.model.Character
 import ru.otus.compose.ui.theme.AppTheme
-import ru.otus.compose.data.model.toState
+import ru.otus.compose.ui.common.CommonItemState
 
 @Composable
 fun CharactersScreen(
@@ -119,8 +119,8 @@ private fun CharacterList(
         LazyColumn {
             items(count = lazyItems.itemCount) { index ->
                 val character = lazyItems[index]
-                DataViewItem(
-                    dataViewState = character!!.toState("character/${character.id}"),
+                CommonItem(
+                    state = character!!.toCommonItemState(),
                     navHostController = navHostController
                 )
             }
@@ -172,4 +172,12 @@ private fun CharacterList(
             }
         }
     }
+}
+
+private fun Character.toCommonItemState(): CommonItemState {
+    return CommonItemState(
+        title = name,
+        imageUrl = imageUrl,
+        navigationLink = "character/$id"
+    )
 }

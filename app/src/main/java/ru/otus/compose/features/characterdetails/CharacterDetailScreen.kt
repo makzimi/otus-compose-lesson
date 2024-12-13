@@ -1,4 +1,4 @@
-package ru.otus.compose.features.herodetails
+package ru.otus.compose.features.characterdetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,42 +42,9 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.R
-import ru.otus.compose.common.resolve
-import ru.otus.compose.data.model.Character
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
-
-private sealed interface CharacterState {
-    data object Loading: CharacterState
-    data class Error(val throwable: Throwable): CharacterState
-    data class Data(
-        val id: Long,
-        val name: String,
-        val description: String,
-        val imageUrl: String,
-        val comicCollectionId: String?,
-        val navigationLink: String
-    ): CharacterState
-}
-
-private fun Character.toState(): CharacterState.Data {
-    return CharacterState.Data(
-        id = id,
-        name = name,
-        description = description,
-        comicCollectionId = comicCollectionId,
-        imageUrl = imageUrl,
-        navigationLink = "character/${id}",
-    )
-}
-
-private suspend fun CharacterDetailsViewModel.fetchCharacterAsState(characterId: Long): CharacterState {
-    return fetchCharacter(characterId).resolve(
-        onSuccess = { character -> character.toState() },
-        onError = { throwable -> CharacterState.Error(throwable) }
-    )
-}
 
 @Composable
 fun CharacterDetailScreen(
@@ -148,7 +115,7 @@ private fun CharacterDetailsContent(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                state.unsafeMutable().value = viewModel.fetchCharacterAsState(characterId)
+                state.unsafeMutable().value = viewModel.fetchCharacter(characterId)
                 swipeRefreshState.isRefreshing = false
             }
         }
@@ -166,7 +133,7 @@ private fun CharacterDetailsContent(
             ) {
                 coroutineScope.launch {
                     state.unsafeMutable().value = CharacterState.Loading
-                    state.unsafeMutable().value = viewModel.fetchCharacterAsState(characterId)
+                    state.unsafeMutable().value = viewModel.fetchCharacter(characterId)
                 }
             }
         }
@@ -183,7 +150,7 @@ private fun getState(
     characterId: Long,
 ): State<CharacterState> {
     return produceState<CharacterState>(initialValue = CharacterState.Loading) {
-        value = viewModel.fetchCharacterAsState(characterId = characterId)
+        value = viewModel.fetchCharacter(characterId = characterId)
     }
 }
 

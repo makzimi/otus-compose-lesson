@@ -2,7 +2,6 @@ package ru.otus.compose.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.otus.compose.ui.common.DataViewState
 
 @Serializable
 data class CharacterDataWrapperDto(

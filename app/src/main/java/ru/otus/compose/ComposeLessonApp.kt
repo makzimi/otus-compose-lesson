@@ -7,10 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import ru.otus.compose.features.comics.ComicDetailInfoScreen
+import ru.otus.compose.features.comicdetails.ComicDetailsScreen
 import ru.otus.compose.features.comics.ComicsScreen
-import ru.otus.compose.features.herodetails.CharacterDetailScreen
-import ru.otus.compose.features.heroes.CharactersScreen
+import ru.otus.compose.features.characterdetails.CharacterDetailScreen
+import ru.otus.compose.features.characters.CharactersScreen
 import ru.otus.compose.ui.SplashScreen
 import ru.otus.compose.ui.theme.AppTheme
 import ru.otus.compose.ui.theme.ComposeLessonTheme
@@ -64,7 +64,7 @@ fun ComposeLessonApp(
                     arguments = listOf(navArgument("comicInfoId") { type = NavType.StringType })
                 ) { backStackEntry ->
                     backStackEntry.arguments?.getString("comicInfoId")?.let { id ->
-                        ComicDetailInfoScreen(
+                        ComicDetailsScreen(
                             navHostController = navController,
                             comicsId = id
                         )

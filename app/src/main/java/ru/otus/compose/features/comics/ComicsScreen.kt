@@ -21,58 +21,15 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-import ru.otus.compose.ui.common.DataViewItem
+import ru.otus.compose.ui.common.CommonItem
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
-import ru.otus.compose.common.resolve
-import ru.otus.compose.data.model.Comic
 import androidx.compose.foundation.lazy.items
-import ru.otus.compose.ui.common.DataViewState
-
-sealed interface ComicsState {
-    data object Loading : ComicsState
-    data class Error(val throwable: Throwable) : ComicsState
-    data class Data(val comics: List<ComicState>) : ComicsState {
-        data class ComicState(
-            val id: String,
-            val title: String,
-            val description: String?,
-            val imageUrl: String,
-        )
-    }
-}
-
-private fun Comic.toState(): ComicsState.Data.ComicState {
-    return ComicsState.Data.ComicState(
-        id = id,
-        title = title,
-        description = description,
-        imageUrl = imageUrl,
-    )
-}
-
-private fun ComicsState.Data.ComicState.toDataViewState(): DataViewState {
-    return DataViewState(
-        title = title,
-        imageUrl = imageUrl,
-        navigationLink = "comicInfo/$id"
-    )
-}
-
-private suspend fun ComicsViewModel.fetchComicsForCharacterAsState(comicId: String): ComicsState {
-    return fetchComicsForCharacter(comicId).resolve(
-        onSuccess = { comics ->
-            ComicsState.Data(
-                comics = comics.map { comic -> comic.toState() }
-            )
-        },
-        onError = { throwable -> ComicsState.Error(throwable) }
-    )
-}
+import ru.otus.compose.ui.common.CommonItemState
 
 @Composable
 fun ComicsScreen(
@@ -153,7 +110,7 @@ private fun ComicsList(
     val state = remember { mutableStateOf<ComicsState>(ComicsState.Loading) }
 
     LaunchedEffect(true) {
-        state.value = viewModel.fetchComicsForCharacterAsState(characterId)
+        state.value = viewModel.fetchComicsForCharacter(characterId)
     }
 
     SwipeRefresh(
@@ -162,7 +119,7 @@ private fun ComicsList(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                state.value = viewModel.fetchComicsForCharacterAsState(characterId)
+                state.value = viewModel.fetchComicsForCharacter(characterId)
                 swipeRefreshState.isRefreshing = false
             }
         }
@@ -182,7 +139,7 @@ private fun ComicsList(
                 ) {
                     coroutineScope.launch {
                         state.value = ComicsState.Loading
-                        state.value = viewModel.fetchComicsForCharacterAsState(characterId)
+                        state.value = viewModel.fetchComicsForCharacter(characterId)
                     }
                 }
             }
@@ -198,10 +155,18 @@ fun Comics(
 ) {
     LazyColumn(modifier = modifier) {
         items(state.comics) { comicState ->
-            DataViewItem(
+            CommonItem(
                 navHostController = navHostController,
-                dataViewState = comicState.toDataViewState()
+                state = comicState.toCommonItemState()
             )
         }
     }
+}
+
+private fun ComicsState.Data.ComicState.toCommonItemState(): CommonItemState {
+    return CommonItemState(
+        title = title,
+        imageUrl = imageUrl,
+        navigationLink = "comicInfo/$id"
+    )
 }
