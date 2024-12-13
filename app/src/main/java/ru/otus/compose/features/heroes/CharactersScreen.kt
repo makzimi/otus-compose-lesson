@@ -32,19 +32,19 @@ import ru.otus.compose.ui.common.LoadingItem
 import ru.otus.compose.ui.common.LoadingView
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import ru.otus.compose.data.dto.HeroDto
+import ru.otus.compose.data.model.Character
 import ru.otus.compose.ui.theme.AppTheme
-import ru.otus.compose.data.dto.toDataView
+import ru.otus.compose.data.model.toState
 
 @Composable
-fun HeroesListScreen(
+fun CharactersScreen(
     navHostController: NavHostController,
     onToggleTheme: OnThemeToggle,
-    heroesViewModel: HeroesViewModel = hiltViewModel(),
+    charactersViewModel: CharactersViewModel = hiltViewModel(),
 ) {
-    HeroesListContent(
+    CharactersContent(
         navHostController = navHostController,
-        heroesViewModel = heroesViewModel,
+        charactersViewModel = charactersViewModel,
         onToggleTheme = onToggleTheme,
         modifier = Modifier.fillMaxSize(),
     )
@@ -52,19 +52,19 @@ fun HeroesListScreen(
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HeroesListContent(
+private fun CharactersContent(
     navHostController: NavHostController,
-    heroesViewModel: HeroesViewModel,
+    charactersViewModel: CharactersViewModel,
     onToggleTheme: OnThemeToggle,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = { HeroesTopBar(onToggleTheme = onToggleTheme) },
+        topBar = { CharactersTopBar(onToggleTheme = onToggleTheme) },
         content = { innerPadding ->
-            HeroesList(
+            CharacterList(
                 navHostController = navHostController,
-                heroesViewModel = heroesViewModel,
+                viewModel = charactersViewModel,
                 modifier = Modifier.padding(innerPadding),
             )
         },
@@ -74,7 +74,7 @@ fun HeroesListContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeroesTopBar(
+private fun CharactersTopBar(
     onToggleTheme: OnThemeToggle,
     modifier: Modifier = Modifier,
 ) {
@@ -101,13 +101,13 @@ fun HeroesTopBar(
 }
 
 @Composable
-fun HeroesList(
+private fun CharacterList(
     navHostController: NavHostController,
-    heroesViewModel: HeroesViewModel,
+    viewModel: CharactersViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val lazyItems: LazyPagingItems<HeroDto> =
-        heroesViewModel.heroes.collectAsLazyPagingItems()
+    val lazyItems: LazyPagingItems<Character> =
+        viewModel.characters.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val context = LocalContext.current
 
@@ -118,14 +118,14 @@ fun HeroesList(
     ) {
         LazyColumn {
             items(count = lazyItems.itemCount) { index ->
-                val hero = lazyItems[index]
+                val character = lazyItems[index]
                 DataViewItem(
-                    dataViewState = hero!!.toDataView("hero/${hero.id}"),
+                    dataViewState = character!!.toState("character/${character.id}"),
                     navHostController = navHostController
                 )
             }
 
-            lazyItems.apply {
+            with(lazyItems) {
                 when {
                     loadState.refresh is LoadState.Loading -> {
                         if (swipeRefreshState.isSwipeInProgress) {

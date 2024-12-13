@@ -1,5 +1,6 @@
 package ru.otus.compose.features.comics
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
@@ -24,19 +27,72 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import ru.otus.compose.features.herodetails.BigHeroImage
+import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.ComicsListDto.ComicsDto
-import ru.otus.compose.data.dto.getImageUrl
+import ru.otus.compose.R
+import ru.otus.compose.common.resolve
+import ru.otus.compose.data.model.Comic
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
+
+sealed interface ComicDetailsState {
+    data object Loading: ComicDetailsState
+    data class Error(val throwable: Throwable): ComicDetailsState
+    data class Data(
+        val id: String,
+        val title: String,
+        val description: String?,
+        val imageUrl: String,
+    ): ComicDetailsState
+}
+
+fun Comic.toDetailsState(): ComicDetailsState.Data {
+    return ComicDetailsState.Data(
+        id = id,
+        title = title,
+        description = description,
+        imageUrl = imageUrl,
+    )
+}
+
+private suspend fun ComicsViewModel.fetchComicDetailsAsState(comicId: String): ComicDetailsState {
+    return fetchComicDetails(comicId = comicId).resolve(
+        onSuccess = { comic -> comic.toDetailsState() },
+        onError = { throwable -> ComicDetailsState.Error(throwable) }
+    )
+}
+
+@Composable
+fun ComicDetailInfoScreen(
+    comicsId: String,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+    viewModel: ComicsViewModel = hiltViewModel(),
+) {
+    Scaffold(
+        topBar = {
+            ComicDetailInfoTopBar(
+                navHostController = navHostController,
+                modifier.fillMaxWidth(),
+            )
+        },
+        content = { innerPadding ->
+            ComicDetailInfo(
+                comicsId = comicsId,
+                modifier = Modifier.padding(innerPadding),
+                viewModel = viewModel,
+            )
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,45 +123,17 @@ private fun ComicDetailInfoTopBar(
 }
 
 @Composable
-fun ComicDetailInfoScreen(
-    comicsId: String,
-    navHostController: NavHostController,
-    modifier: Modifier = Modifier,
-    viewModel: ComicsViewModel = hiltViewModel(),
-) {
-    Scaffold(
-        topBar = {
-            ComicDetailInfoTopBar(
-                navHostController = navHostController,
-                modifier.fillMaxWidth(),
-            )
-        },
-        content = { innerPadding ->
-            ComicDetailInfo(
-                comicsId = comicsId,
-                navHostController = navHostController,
-                modifier = Modifier.padding(innerPadding),
-                viewModel = viewModel,
-            )
-        }
-    )
-}
-
-@Composable
 private fun ComicDetailInfo(
     comicsId: String,
-    navHostController: NavHostController,
     modifier: Modifier = Modifier,
     viewModel: ComicsViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
-    val comicsInfo =
-        remember { mutableStateOf<GreatResult<ComicsDto>>(GreatResult.Progress) }
+    val state = remember { mutableStateOf<ComicDetailsState>(ComicDetailsState.Loading) }
 
     LaunchedEffect(Unit) {
-        val info = viewModel.fetchComicDetailInfo(comicsId)
-        comicsInfo.value = info
+        state.value = viewModel.fetchComicDetailsAsState(comicsId)
     }
 
     SwipeRefresh(
@@ -114,25 +142,24 @@ private fun ComicDetailInfo(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
+                state.value = viewModel.fetchComicDetailsAsState(comicsId)
                 swipeRefreshState.isRefreshing = false
             }
         }
     ) {
-        when (val comicsInfoDto = comicsInfo.value) {
-            is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
-            is GreatResult.Success -> ComicsInfoContent(
-                comicsDto = comicsInfoDto.data,
-                navHostController = navHostController
+        when (val comicDetailsState = state.value) {
+            is ComicDetailsState.Loading -> LoadingView(modifier = Modifier.fillMaxSize())
+            is ComicDetailsState.Data -> ComicsInfoContent(
+                state = comicDetailsState,
             )
 
-            is GreatResult.Error -> ErrorItem(
-                message = comicsInfoDto.exception.message.toString(),
+            is ComicDetailsState.Error -> ErrorItem(
+                message = comicDetailsState.throwable.message.toString(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 coroutineScope.launch {
-                    comicsInfo.value = GreatResult.Progress
-                    comicsInfo.value = viewModel.fetchComicDetailInfo(comicsId)
+                    state.value = ComicDetailsState.Loading
+                    state.value = viewModel.fetchComicDetailsAsState(comicsId)
                 }
             }
         }
@@ -141,9 +168,8 @@ private fun ComicDetailInfo(
 
 @Composable
 fun ComicsInfoContent(
-    comicsDto: ComicsDto,
+    state: ComicDetailsState.Data,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController
 ) {
     Column(
         modifier = modifier
@@ -151,27 +177,50 @@ fun ComicsInfoContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        BigHeroImage(url = comicsDto.thumbnail.getImageUrl())
+        BigImage(url = state.imageUrl)
         Spacer(modifier = Modifier.height(16.dp))
-        BigComicsInfo(comicsInfo = comicsDto)
+        BigComicsInfo(state = state)
     }
 }
 
 @Composable
-fun BigComicsInfo(comicsInfo: ComicsDto) {
+private fun BigImage(url: String) {
+    Card(
+        shape = RoundedCornerShape(32.dp),
+        modifier = Modifier
+            .background(color = AppTheme.colors.card)
+            .fillMaxWidth()
+            .height(240.dp)
+            .padding(16.dp)
+    ) {
+        Image(
+            painter = rememberGlidePainter(
+                request = url,
+                fadeIn = true,
+                requestBuilder = { placeholder(R.drawable.default_image) }
+            ),
+            contentDescription = stringResource(R.string.hero_image_description),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+fun BigComicsInfo(state: ComicDetailsState.Data) {
     Column(
         modifier = Modifier
             .background(AppTheme.colors.background)
             .padding(16.dp)
     ) {
         Text(
-            text = comicsInfo.title,
+            text = state.title,
             color = AppTheme.colors.text,
             style = AppTheme.typography.h3
         )
-        if (comicsInfo.description != null) {
+        if (state.description != null) {
             Text(
-                text = comicsInfo.description,
+                text = state.description,
                 color = AppTheme.colors.text,
                 style = AppTheme.typography.textMediumBold
             )

@@ -9,20 +9,20 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import ru.otus.compose.data.dto.HeroDto
-import ru.otus.compose.data.repository.HeroRepository
-import ru.otus.compose.data.HeroPagingSource
+import ru.otus.compose.data.repository.CharactersRepository
+import ru.otus.compose.data.CharactersPagingSource
+import ru.otus.compose.data.model.Character
 import javax.inject.Inject
 
 @HiltViewModel
-class HeroesViewModel
+class CharactersViewModel
 @Inject constructor(
-    private var heroRepository: HeroRepository
+    private var charactersRepository: CharactersRepository
 ) : ViewModel(), LifecycleObserver {
 
-    val heroes: Flow<PagingData<HeroDto>> = Pager(
+    val characters: Flow<PagingData<Character>> = Pager(
         PagingConfig(pageSize = 20)
     ) {
-        HeroPagingSource(heroRepository)
+        CharactersPagingSource(charactersRepository)
     }.flow.cachedIn(viewModelScope)
 }

@@ -9,8 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ru.otus.compose.features.comics.ComicDetailInfoScreen
 import ru.otus.compose.features.comics.ComicsScreen
-import ru.otus.compose.features.herodetails.HeroDetailScreen
-import ru.otus.compose.features.heroes.HeroesListScreen
+import ru.otus.compose.features.herodetails.CharacterDetailScreen
+import ru.otus.compose.features.heroes.CharactersScreen
 import ru.otus.compose.ui.SplashScreen
 import ru.otus.compose.ui.theme.AppTheme
 import ru.otus.compose.ui.theme.ComposeLessonTheme
@@ -29,31 +29,33 @@ fun ComposeLessonApp(
                 composable("splash") {
                     SplashScreen(navHostController = navController)
                 }
-                composable("heroesList") {
-                    HeroesListScreen(
+                composable("characters") {
+                    CharactersScreen(
                         navHostController = navController,
                         onToggleTheme = onToggleTheme
                     )
                 }
                 composable(
-                    "comicsInfo/{comicsId}",
-                    arguments = listOf(navArgument("comicsId") { type = NavType.StringType })
+                    "comicsCollection/{comicsCollectionId}",
+                    arguments = listOf(
+                        navArgument("comicsCollectionId") { type = NavType.StringType }
+                    )
                 ) { backStackEntry ->
-                    backStackEntry.arguments?.getString("comicsId")?.let {
+                    backStackEntry.arguments?.getString("comicsCollectionId")?.let {
                         ComicsScreen(
                             navHostController = navController,
-                            comicsId = it
+                            characterId = it
                         )
                     }
                 }
                 composable(
-                    "hero/{heroId}",
-                    arguments = listOf(navArgument("heroId") { type = NavType.LongType })
+                    "character/{characterId}",
+                    arguments = listOf(navArgument("characterId") { type = NavType.LongType })
                 ) { backStackEntry ->
-                    backStackEntry.arguments?.getLong("heroId")?.let { id ->
-                        HeroDetailScreen(
+                    backStackEntry.arguments?.getLong("characterId")?.let { id ->
+                        CharacterDetailScreen(
                             navHostController = navController,
-                            heroId = id
+                            characterId = id
                         )
                     }
                 }

@@ -18,7 +18,7 @@ fun SplashScreen(
     SplashContent()
     LaunchedEffect(true) {
         delay(500)
-        navHostController.navigate("heroesList") {
+        navHostController.navigate("characters") {
             popUpTo("splash") { inclusive = true }
         }
     }

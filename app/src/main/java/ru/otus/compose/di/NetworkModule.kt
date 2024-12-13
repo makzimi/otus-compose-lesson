@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import ru.otus.compose.data.HeaderInterceptor
-import ru.otus.compose.data.HeroService
+import ru.otus.compose.data.MarvelService
 import javax.inject.Singleton
 
 @Module
@@ -28,7 +28,7 @@ object NetworkModule {
     @ExperimentalSerializationApi
     @Singleton
     @Provides
-    fun provideHeroService(okHttpClient: OkHttpClient): HeroService {
+    fun provideHeroService(okHttpClient: OkHttpClient): MarvelService {
         val contentType = "application/json".toMediaTypeOrNull()
             ?: throw IllegalArgumentException("Should be not null")
         return Retrofit.Builder()
@@ -37,7 +37,7 @@ object NetworkModule {
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(okHttpClient)
             .build()
-            .create(HeroService::class.java)
+            .create(MarvelService::class.java)
     }
 
     @Provides

@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.glide.rememberGlidePainter
@@ -43,31 +42,61 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import ru.otus.compose.R
-import ru.otus.compose.data.GreatResult
-import ru.otus.compose.data.dto.getImageUrl
-import ru.otus.compose.data.dto.HeroInfoDto
+import ru.otus.compose.common.resolve
+import ru.otus.compose.data.model.Character
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
 
+private sealed interface CharacterState {
+    data object Loading: CharacterState
+    data class Error(val throwable: Throwable): CharacterState
+    data class Data(
+        val id: Long,
+        val name: String,
+        val description: String,
+        val imageUrl: String,
+        val comicCollectionId: String?,
+        val navigationLink: String
+    ): CharacterState
+}
+
+private fun Character.toState(): CharacterState.Data {
+    return CharacterState.Data(
+        id = id,
+        name = name,
+        description = description,
+        comicCollectionId = comicCollectionId,
+        imageUrl = imageUrl,
+        navigationLink = "character/${id}",
+    )
+}
+
+private suspend fun CharacterDetailsViewModel.fetchCharacterAsState(characterId: Long): CharacterState {
+    return fetchCharacter(characterId).resolve(
+        onSuccess = { character -> character.toState() },
+        onError = { throwable -> CharacterState.Error(throwable) }
+    )
+}
+
 @Composable
-fun HeroDetailScreen(
+fun CharacterDetailScreen(
     navHostController: NavHostController,
-    heroId: Long,
-    heroDetailsViewModel: HeroDetailsViewModel = hiltViewModel(),
+    characterId: Long,
+    viewModel: CharacterDetailsViewModel = hiltViewModel(),
 ) {
     Scaffold(
         topBar = {
-            HeroDetailTopBar(
+            CharacterDetailsTopBar(
                 navHostController = navHostController,
                 modifier = Modifier.fillMaxWidth(),
             )
         },
         content = { innerPadding ->
-            HeroDetailContent(
-                heroId = heroId,
+            CharacterDetailsContent(
+                characterId = characterId,
                 navHostController = navHostController,
-                heroDetailsViewModel = heroDetailsViewModel,
+                viewModel = viewModel,
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -76,7 +105,7 @@ fun HeroDetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeroDetailTopBar(
+private fun CharacterDetailsTopBar(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
@@ -103,15 +132,15 @@ fun HeroDetailTopBar(
 }
 
 @Composable
-fun HeroDetailContent(
-    heroId: Long,
+private fun CharacterDetailsContent(
+    characterId: Long,
     navHostController: NavHostController,
-    heroDetailsViewModel: HeroDetailsViewModel,
+    viewModel: CharacterDetailsViewModel,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
-    val heroInfo: State<GreatResult<HeroInfoDto>> = getState(heroDetailsViewModel, heroId)
+    val state: State<CharacterState> = getState(viewModel, characterId)
 
     SwipeRefresh(
         modifier = modifier,
@@ -119,25 +148,25 @@ fun HeroDetailContent(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
+                state.unsafeMutable().value = viewModel.fetchCharacterAsState(characterId)
                 swipeRefreshState.isRefreshing = false
             }
         }
     ) {
-        when (val heroInfoResult = heroInfo.value) {
-            is GreatResult.Progress -> LoadingView(modifier = Modifier.fillMaxSize())
-            is GreatResult.Success -> HeroInfoContent(
-                heroInfoDto = heroInfoResult.data,
+        when (val characterState = state.value) {
+            is CharacterState.Loading -> LoadingView(modifier = Modifier.fillMaxSize())
+            is CharacterState.Data -> CharacterContent(
+                state = characterState,
                 navHostController = navHostController
             )
 
-            is GreatResult.Error -> ErrorItem(
-                message = heroInfoResult.exception.message.toString(),
+            is CharacterState.Error -> ErrorItem(
+                message = characterState.throwable.message.toString(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 coroutineScope.launch {
-                    heroInfo.unsafeMutable().value = GreatResult.Progress
-                    heroInfo.unsafeMutable().value = heroDetailsViewModel.fetchHeroInfo(heroId = heroId)
+                    state.unsafeMutable().value = CharacterState.Loading
+                    state.unsafeMutable().value = viewModel.fetchCharacterAsState(characterId)
                 }
             }
         }
@@ -150,17 +179,17 @@ inline fun <reified T> State<T>.unsafeMutable(): MutableState<T> {
 
 @Composable
 private fun getState(
-    heroDetailsViewModel: HeroDetailsViewModel,
-    heroId: Long,
-    ): State<GreatResult<HeroInfoDto>> {
-    return produceState<GreatResult<HeroInfoDto>>(initialValue = GreatResult.Progress) {
-        value = heroDetailsViewModel.fetchHeroInfo(heroId)
+    viewModel: CharacterDetailsViewModel,
+    characterId: Long,
+): State<CharacterState> {
+    return produceState<CharacterState>(initialValue = CharacterState.Loading) {
+        value = viewModel.fetchCharacterAsState(characterId = characterId)
     }
 }
 
 @Composable
-fun HeroInfoContent(
-    heroInfoDto: HeroInfoDto,
+private fun CharacterContent(
+    state: CharacterState.Data,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
@@ -170,31 +199,23 @@ fun HeroInfoContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        BigHeroImage(url = heroInfoDto.thumbnail.getImageUrl())
+        BigImage(url = state.imageUrl)
         Spacer(modifier = Modifier.height(16.dp))
-        BigHeroInfo(heroInfo = heroInfoDto)
-        ComicsItem(navHostController, heroInfoDto)
+        CharacterDescription(state = state)
+        ComicsItem(navHostController, state)
     }
 }
 
 @Composable
-fun ComicsItem(
+private fun ComicsItem(
     navHostController: NavHostController,
-    heroInfoDto: HeroInfoDto
+    state: CharacterState.Data
 ) {
     Row(
         modifier = Modifier
             .padding(16.dp)
             .clickable {
-                navHostController.navigate(
-                    "comicsInfo/${
-                        heroInfoDto.comicsDto.collectionUri.toUri().path
-                            ?.split(
-                                "/"
-                            )
-                            ?.get(4)
-                    }"
-                )
+                navHostController.navigate("comicsCollection/${state.comicCollectionId}")
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -222,7 +243,7 @@ fun ComicsItem(
 }
 
 @Composable
-fun BigHeroImage(url: String) {
+private fun BigImage(url: String) {
     Card(
         shape = RoundedCornerShape(32.dp),
         modifier = Modifier
@@ -245,19 +266,19 @@ fun BigHeroImage(url: String) {
 }
 
 @Composable
-fun BigHeroInfo(heroInfo: HeroInfoDto) {
+private fun CharacterDescription(state: CharacterState.Data) {
     Column(
         modifier = Modifier
             .background(AppTheme.colors.background)
             .padding(16.dp)
     ) {
         Text(
-            text = heroInfo.name,
+            text = state.name,
             color = AppTheme.colors.text,
             style = AppTheme.typography.h3
         )
         Text(
-            text = heroInfo.description,
+            text = state.description,
             color = AppTheme.colors.text,
             style = AppTheme.typography.textMediumBold
         )
