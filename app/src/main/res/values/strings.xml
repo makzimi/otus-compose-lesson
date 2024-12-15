@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">ComposeLesson</string>
     <string name="hero_image_description">Hero image</string>
+
+    <string name="profile_name">Erwin Schrödinger</string>
+    <string name="post_date">09 Jul 1935, 16:00</string>
+    <string name="post_text">🐱 Experiment Log:
+        \n\nToday, I’ve been pondering the peculiarities of quantum mechanics. What if we imagine a cat, sealed in a box, where its life hinges on the decay of a radioactive atom? Without opening the box, is the cat alive or not? Perhaps, in a quantum sense, it is both—until we observe it.
+        \n\nThis paradox is both troubling and fascinating. It forces us to confront the role of observation in shaping reality.
+        \n\nWhat do you think? Can observation truly define existence? 🤔
+        </string>
 </resources>
