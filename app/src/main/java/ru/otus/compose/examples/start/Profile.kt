@@ -23,7 +23,6 @@ fun Profile() {
         Image(
             painter = painterResource(id = R.drawable.profile),
             contentDescription = null,
-            modifier = Modifier.size(32.dp)
         )
         Column{
             Text(text = stringResource(R.string.profile_name))
