@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import ru.otus.compose.ui.theme.ComposeLessonTheme
@@ -25,7 +26,7 @@ import ru.otus.compose.ui.theme.ComposeLessonTheme
 @Composable
 fun AndroidView(list: List<String> = emptyList()) {
     Column {
-        androidx.compose.ui.viewinterop.AndroidView(
+        AndroidView(
             modifier = Modifier
                 .fillMaxSize()
                 .height(50.dp),
@@ -70,7 +71,7 @@ class CallToActionViewButton @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        ComposeLessonTheme (true) {
+        ComposeLessonTheme(true) {
             CallToActionButton(
                 text = text,
                 onClick = onClick
