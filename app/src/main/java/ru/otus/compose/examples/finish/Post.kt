@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.otus.compose.R
 
 @Composable
 fun Post(
@@ -34,30 +33,5 @@ fun Post(
             postSection()
             buttonsSection()
         }
-    }
-}
-
-@Composable
-fun BottomButtons(
-    onLikeClicked: () -> Unit = { },
-    onBookmarkClicked: () -> Unit = { },
-    onShareClicked: () -> Unit = { },
-) {
-    Row(
-        horizontalArrangement = Arrangement.End,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        PostButton(
-            icon = R.drawable.ic_like,
-            onClick = onLikeClicked,
-        )
-        PostButton(
-            icon = R.drawable.ic_bookmark,
-            onClick = onBookmarkClicked,
-        )
-        PostButton(
-            icon = R.drawable.ic_share,
-            onClick = onShareClicked,
-        )
     }
 }
