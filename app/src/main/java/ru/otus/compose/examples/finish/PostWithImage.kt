@@ -24,6 +24,7 @@ fun PostWithImage(
     modifier: Modifier = Modifier,
 ) {
     Post(
+        modifier = modifier,
         userSection = {
             Profile(
                 profileState = state.profileState
@@ -38,7 +39,6 @@ fun PostWithImage(
             )
         },
         buttonsSection = { BottomButtons() },
-        modifier = modifier,
     )
 }
 
