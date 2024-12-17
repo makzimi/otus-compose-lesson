@@ -24,7 +24,7 @@ import androidx.constraintlayout.compose.ConstraintSet
 import ru.otus.compose.ui.theme.ComposeLessonTheme
 
 @Composable
-fun AndroidView(list: List<String> = emptyList()) {
+fun AndroidView() {
     Column {
         AndroidView(
             modifier = Modifier
