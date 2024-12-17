@@ -13,10 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import ru.otus.compose.R
 
 @Immutable
-data class PostWithImageState(
-    val profileState: ProfileState,
+class PostWithImageState(
+    profileState: ProfileState,
     val postImage: Int
-)
+) : PostState(profileState = profileState)
 
 @Composable
 fun PostWithImage(

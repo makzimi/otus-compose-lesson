@@ -12,10 +12,10 @@ import androidx.compose.ui.unit.sp
 import ru.otus.compose.R
 
 @Immutable
-data class PostWithTextState(
-    val profileState: ProfileState,
+class PostWithTextState(
+    profileState: ProfileState,
     val postText: String
-)
+) : PostState(profileState = profileState)
 
 @Composable
 fun PostWithText(
