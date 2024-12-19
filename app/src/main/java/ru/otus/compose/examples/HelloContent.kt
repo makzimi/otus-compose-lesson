@@ -1,4 +1,4 @@
-package ru.otus.compose.examples.finish
+package ru.otus.compose.examples
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
