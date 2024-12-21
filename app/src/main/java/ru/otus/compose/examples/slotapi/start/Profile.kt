@@ -1,4 +1,4 @@
-package ru.otus.compose.examples.start
+package ru.otus.compose.examples.slotapi.start
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package ru.otus.compose.examples.finish
+package ru.otus.compose.examples.slotapi.finish
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

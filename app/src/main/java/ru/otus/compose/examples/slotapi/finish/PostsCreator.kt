@@ -1,4 +1,4 @@
-package ru.otus.compose.examples.finish
+package ru.otus.compose.examples.slotapi.finish
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
