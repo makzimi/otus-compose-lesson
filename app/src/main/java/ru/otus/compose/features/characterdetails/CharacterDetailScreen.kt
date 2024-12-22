@@ -41,6 +41,7 @@ import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+import ru.otus.compose.ComicsCollection
 import ru.otus.compose.R
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingView
@@ -182,7 +183,9 @@ private fun ComicsItem(
         modifier = Modifier
             .padding(16.dp)
             .clickable {
-                navHostController.navigate("comicsCollection/${state.comicCollectionId}")
+                navHostController.navigate(
+                    ComicsCollection(comicsCollectionId = state.comicCollectionId.orEmpty())
+                )
             },
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -178,6 +178,6 @@ private fun Character.toCommonItemState(): CommonItemState {
     return CommonItemState(
         title = name,
         imageUrl = imageUrl,
-        navigationLink = "character/$id"
+        navigationDestination = ru.otus.compose.Character(id)
     )
 }

@@ -26,7 +26,7 @@ import ru.otus.compose.R
 data class CommonItemState(
     val title: String,
     val imageUrl: String,
-    val navigationLink: String
+    val navigationDestination: Any,
 )
 
 @Composable
@@ -40,7 +40,9 @@ fun CommonItem(
         modifier = modifier
             .background(color = AppTheme.colors.card)
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .clickable(onClick = { navHostController.navigate(state.navigationLink) })
+            .clickable(onClick = {
+                navHostController.navigate(state.navigationDestination)
+            })
             .fillMaxWidth()
             .wrapContentHeight()
     ) {

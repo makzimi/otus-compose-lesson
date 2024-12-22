@@ -2,11 +2,10 @@ package ru.otus.compose
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import ru.otus.compose.features.comicdetails.ComicDetailsScreen
 import ru.otus.compose.features.comics.ComicsScreen
 import ru.otus.compose.features.characterdetails.CharacterDetailScreen
@@ -25,50 +24,40 @@ fun ComposeLessonApp(
     ComposeLessonTheme(darkTheme = darkTheme) {
         Surface(color = AppTheme.colors.background) {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "splash") {
-                composable("splash") {
+            NavHost(
+                navController = navController,
+                startDestination = Splash,
+            ) {
+                composable<Splash> {
                     SplashScreen(navHostController = navController)
                 }
-                composable("characters") {
+
+                composable<Characters> {
                     CharactersScreen(
                         navHostController = navController,
                         onToggleTheme = onToggleTheme
                     )
                 }
-                composable(
-                    "comicsCollection/{comicsCollectionId}",
-                    arguments = listOf(
-                        navArgument("comicsCollectionId") { type = NavType.StringType }
+                composable<ComicsCollection> { backStackEntry ->
+                    val comicsCollection: ComicsCollection = backStackEntry.toRoute()
+                    ComicsScreen(
+                        navHostController = navController,
+                        characterId = comicsCollection.comicsCollectionId
                     )
-                ) { backStackEntry ->
-                    backStackEntry.arguments?.getString("comicsCollectionId")?.let {
-                        ComicsScreen(
-                            navHostController = navController,
-                            characterId = it
-                        )
-                    }
                 }
-                composable(
-                    "character/{characterId}",
-                    arguments = listOf(navArgument("characterId") { type = NavType.LongType })
-                ) { backStackEntry ->
-                    backStackEntry.arguments?.getLong("characterId")?.let { id ->
-                        CharacterDetailScreen(
-                            navHostController = navController,
-                            characterId = id
-                        )
-                    }
+                composable<Character> { backStackEntry ->
+                    val character: Character = backStackEntry.toRoute()
+                    CharacterDetailScreen(
+                        navHostController = navController,
+                        characterId = character.character,
+                    )
                 }
-                composable(
-                    "comicInfo/{comicInfoId}",
-                    arguments = listOf(navArgument("comicInfoId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    backStackEntry.arguments?.getString("comicInfoId")?.let { id ->
-                        ComicDetailsScreen(
-                            navHostController = navController,
-                            comicsId = id
-                        )
-                    }
+                composable<ComicInfo> { backStackEntry ->
+                    val comicInfo: ComicInfo = backStackEntry.toRoute()
+                    ComicDetailsScreen(
+                        navHostController = navController,
+                        comicsId = comicInfo.comicInfoId,
+                    )
                 }
             }
         }

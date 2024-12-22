@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.foundation.lazy.items
+import ru.otus.compose.ComicInfo
 import ru.otus.compose.ui.common.CommonItemState
 
 @Composable
@@ -167,6 +168,6 @@ private fun ComicsState.Data.ComicState.toCommonItemState(): CommonItemState {
     return CommonItemState(
         title = title,
         imageUrl = imageUrl,
-        navigationLink = "comicInfo/$id"
+        navigationDestination = ComicInfo(id)
     )
 }

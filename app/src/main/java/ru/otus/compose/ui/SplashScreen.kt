@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
+import ru.otus.compose.Characters
 import ru.otus.compose.R
+import ru.otus.compose.Splash
 
 @Composable
 fun SplashScreen(
@@ -18,8 +20,8 @@ fun SplashScreen(
     SplashContent()
     LaunchedEffect(true) {
         delay(500)
-        navHostController.navigate("characters") {
-            popUpTo("splash") { inclusive = true }
+        navHostController.navigate(Characters) {
+            popUpTo(Splash) { inclusive = true }
         }
     }
 }
