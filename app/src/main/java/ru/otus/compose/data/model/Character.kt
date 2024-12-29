@@ -6,4 +6,5 @@ data class Character(
     val description: String,
     val imageUrl: String,
     val comicCollectionId: String?,
+    val comicNames: List<String>,
 )

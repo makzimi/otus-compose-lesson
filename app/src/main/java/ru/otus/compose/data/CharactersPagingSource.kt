@@ -7,19 +7,20 @@ import ru.otus.compose.data.repository.CharactersRepository
 import ru.otus.compose.data.model.Character
 
 class CharactersPagingSource(
-    private val repository: CharactersRepository
+    private val repository: CharactersRepository,
 ) : PagingSource<Int, Character>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
         val offset = params.key ?: 0
-        val result = repository.loadCharacters(offset, 20)
+        val result = repository.loadCharacters(offset, 50)
 
         return result.resolve(
             onSuccess = { value ->
+                val filtered = value.characters.filter { it.comicNames.isNotEmpty() }
                 LoadResult.Page(
-                    data = value.characters,
-                    prevKey = if (offset == 0) null else offset - 20,
-                    nextKey = value.offset.plus(20)
+                    data = filtered,
+                    prevKey = if (offset == 0) null else offset - 50,
+                    nextKey = value.offset.plus(50)
                 )
             },
             onError = { throwable ->

@@ -39,4 +39,14 @@ data class CharacterDto(
 data class ComicsListDto(
     @SerialName("collectionURI")
     val collectionURI: String,
+    @SerialName("items")
+    val items: List<ComicSummaryDto>,
+)
+
+@Serializable
+data class ComicSummaryDto(
+    @SerialName("resourceURI")
+    val resourceURI: String,
+    @SerialName("name")
+    val name: String,
 )

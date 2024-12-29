@@ -2,6 +2,8 @@ package ru.otus.compose.features.characters
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,7 +28,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import ru.otus.compose.OnThemeToggle
 import ru.otus.compose.ui.common.BrightnessMedium
-import ru.otus.compose.ui.common.CommonItem
 import ru.otus.compose.ui.common.ErrorItem
 import ru.otus.compose.ui.common.LoadingItem
 import ru.otus.compose.ui.common.LoadingView
@@ -106,7 +107,7 @@ private fun CharacterList(
     viewModel: CharactersViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val lazyItems: LazyPagingItems<Character> =
+    val lazyItems: LazyPagingItems<CharacterItemState> =
         viewModel.characters.collectAsLazyPagingItems()
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val context = LocalContext.current
@@ -116,12 +117,17 @@ private fun CharacterList(
         state = swipeRefreshState,
         onRefresh = { lazyItems.refresh() }
     ) {
-        LazyColumn {
+        LazyColumn(
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(count = lazyItems.itemCount) { index ->
-                val character = lazyItems[index]
-                CommonItem(
-                    state = character!!.toCommonItemState(),
-                    navHostController = navHostController
+                val characterItem = lazyItems[index]
+                CharacterItem(
+                    state = characterItem!!,
+                    onClick = {
+                        navHostController.navigate(characterItem.navigationDestination)
+                    },
                 )
             }
 
@@ -172,12 +178,4 @@ private fun CharacterList(
             }
         }
     }
-}
-
-private fun Character.toCommonItemState(): CommonItemState {
-    return CommonItemState(
-        title = name,
-        imageUrl = imageUrl,
-        navigationDestination = ru.otus.compose.Character(id)
-    )
 }

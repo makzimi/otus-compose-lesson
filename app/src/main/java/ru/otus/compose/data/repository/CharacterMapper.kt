@@ -16,6 +16,7 @@ class CharacterMapper @Inject constructor() {
                 ?.split("/")
                 ?.get(4),
             imageUrl = characterDto.thumbnail.getImageUrl(),
+            comicNames = characterDto.comics.items.map{ it.name }
         )
     }
 }
