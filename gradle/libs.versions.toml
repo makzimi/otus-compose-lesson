@@ -10,6 +10,7 @@ androidxHiltNavigationCompose = "1.2.0"
 androidxHiltViewModelCompose = "1.0.0-alpha03"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
+compose-latest = "1.7.6"
 navCompose = "2.8.5"
 constraintLayoutCompose = "1.1.0"
 retrofit = "2.11.0"
@@ -41,6 +42,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics", version.ref = "compose-latest" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
