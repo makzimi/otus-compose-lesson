@@ -27,6 +27,7 @@ fun Feed(
             when (item) {
                 is PostWithTextState -> PostWithText(postWithTextState = item)
                 is PostWithImageState -> PostWithImage(state = item)
+                else -> { }
             }
         }
     }
