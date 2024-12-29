@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Immutable
-sealed class PostState(
+open class PostState(
     val profileState: ProfileState,
 )
 
