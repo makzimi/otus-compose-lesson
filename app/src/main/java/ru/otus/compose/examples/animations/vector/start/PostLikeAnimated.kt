@@ -1,6 +1,5 @@
 package ru.otus.compose.examples.animations.vector.start
 
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
