@@ -33,9 +33,7 @@ import ru.otus.compose.ui.common.LoadingItem
 import ru.otus.compose.ui.common.LoadingView
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import ru.otus.compose.data.model.Character
 import ru.otus.compose.ui.theme.AppTheme
-import ru.otus.compose.ui.common.CommonItemState
 
 @Composable
 fun CharactersScreen(
