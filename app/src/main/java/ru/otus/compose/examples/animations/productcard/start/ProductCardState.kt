@@ -13,9 +13,14 @@ data class ProductCardState(
     val sizes: SizesState,
 ) {
     data class ImagesState(
-        val imagesRes: ImmutableList<Int>,
+        val imagesRes: ImmutableList<ImageState>,
         val currentImage: Int = 0,
-    )
+    ) {
+        data class ImageState(
+            val imageRes: Int,
+            val outOfStock: Boolean,
+        )
+    }
 
     data class ColorsState(
         val colors: ImmutableList<ColorState>,
@@ -24,6 +29,7 @@ data class ProductCardState(
         data class ColorState(
             val colorName: String,
             val color: Color,
+            val outOfStock: Boolean,
         )
     }
 

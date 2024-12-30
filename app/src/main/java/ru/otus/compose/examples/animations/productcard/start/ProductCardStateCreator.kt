@@ -3,6 +3,7 @@ package ru.otus.compose.examples.animations.productcard.start
 import androidx.compose.ui.graphics.Color
 import kotlinx.collections.immutable.persistentListOf
 import ru.otus.compose.R
+import ru.otus.compose.examples.animations.productcard.start.ProductCardState.ImagesState.ImageState
 import ru.otus.compose.examples.animations.productcard.start.ProductCardState.ColorsState
 import ru.otus.compose.examples.animations.productcard.start.ProductCardState.ColorsState.ColorState
 import ru.otus.compose.examples.animations.productcard.start.ProductCardState.ImagesState
@@ -19,21 +20,22 @@ object ProductCardStateCreator {
             description = "Keep your feline friend warm and stylish with this adorable cozy sweater. Perfect for chilly days, it ensures comfort and a snug fit for cats of all sizes. Designed with love and attention to detail, your cat will purr with delight!",
             images = ImagesState(
                 imagesRes = persistentListOf(
-                    R.drawable.sweater_blue,
-                    R.drawable.sweater_red,
-                    R.drawable.sweater_yellow,
-                    R.drawable.sweater_green,
-                    R.drawable.sweater_pink,
+                    ImageState(R.drawable.sweater_blue, false),
+                    ImageState(R.drawable.sweater_red, false),
+                    ImageState(R.drawable.sweater_yellow, false),
+                    ImageState(R.drawable.sweater_green, false),
+                    ImageState(R.drawable.sweater_pink, true),
                 ),
-                currentImage = selectedImage
-            ),
+                currentImage = selectedImage,
+
+                ),
             colors = ColorsState(
                 colors = persistentListOf(
-                    ColorState("Midnight Blue", Color(0xFF001F54)),
-                    ColorState("Crimson Red", Color(0xFFDC143C)),
-                    ColorState("Sunny Yellow", Color(0xFFFFD700)),
-                    ColorState("Forest Green", Color(0xFF228B22)),
-                    ColorState("Blush Pink", Color(0xFFFFC0CB)),
+                    ColorState("Midnight Blue", Color(0xFF001F54), false),
+                    ColorState("Crimson Red", Color(0xFFDC143C), false),
+                    ColorState("Sunny Yellow", Color(0xFFFFD700), false),
+                    ColorState("Forest Green", Color(0xFF228B22), false),
+                    ColorState("Blush Pink", Color(0xFFFFC0CB), true),
                 ),
                 currentColor = selectedColor,
             ),
