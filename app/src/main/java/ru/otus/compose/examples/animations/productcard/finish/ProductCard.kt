@@ -1,5 +1,12 @@
 package ru.otus.compose.examples.animations.productcard.finish
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,8 +42,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -148,7 +153,13 @@ fun Images(
                 )
         )
 
-        if (image.outOfStock) {
+        AnimatedVisibility(
+            visible = image.outOfStock,
+            enter = slideInVertically() + fadeIn(),
+            exit = slideOutVertically() + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        ) {
             Text(
                 text = "Out of stock 😢",
                 style = MaterialTheme.typography.titleLarge,
@@ -162,7 +173,6 @@ fun Images(
                     }
                     .background(color = MaterialTheme.colorScheme.errorContainer)
                     .padding(horizontal = 20.dp, vertical = 10.dp)
-                    .align(Alignment.TopCenter)
             )
         }
     }
@@ -224,13 +234,18 @@ fun ColorControls(
                 }
             }
 
-            if (state.colors[state.currentColor].outOfStock) {
+            AnimatedVisibility(
+                visible = state.colors[state.currentColor].outOfStock,
+                enter = slideInHorizontally { 40 } + fadeIn(),
+                exit = slideOutHorizontally { 40 } + fadeOut(),
+                modifier = Modifier
+                    .align(CenterVertically)
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_error),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier
-                        .align(CenterVertically)
                 )
             }
         }
