@@ -61,7 +61,6 @@ fun ProductCard(
                     top = innerPadding.calculateTopPadding() + 12.dp,
                     bottom = innerPadding.calculateBottomPadding() + 12.dp,
                 ),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Images(
                     image = state.images.imagesRes[state.images.currentImage],
@@ -70,6 +69,7 @@ fun ProductCard(
                 ColorControls(
                     state = state.colors,
                     modifier = Modifier
+                        .padding(top = 16.dp)
                         .padding(horizontal = 20.dp),
                     onColorClicked = onColorClicked,
                 )
@@ -77,6 +77,7 @@ fun ProductCard(
                     SizesControls(
                         state = state.sizes,
                         modifier = Modifier
+                            .padding(top = 16.dp)
                             .padding(horizontal = 20.dp),
                         onSizeClicked = onSizeClicked,
                     )
@@ -84,6 +85,7 @@ fun ProductCard(
                 AboutProduct(
                     description = state.description,
                     modifier = Modifier
+                        .padding(top = 16.dp)
                         .padding(horizontal = 20.dp)
                 )
             }
