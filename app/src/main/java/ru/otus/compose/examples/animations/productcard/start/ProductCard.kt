@@ -196,9 +196,6 @@ fun ColorControls(
                         .clip(CircleShape)
                         .then(
                             if (index == state.currentColor) {
-                                if (colorState.outOfStock) {
-
-                                }
                                 Modifier.border(
                                     width = 2.dp,
                                     color = if (colorState.outOfStock) {
