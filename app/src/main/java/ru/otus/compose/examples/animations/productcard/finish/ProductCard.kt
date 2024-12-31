@@ -80,12 +80,14 @@ fun ProductCard(
                         .padding(horizontal = 20.dp),
                     onColorClicked = onColorClicked,
                 )
-                SizesControls(
-                    state = state.sizes,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp),
-                    onSizeClicked = onSizeClicked,
-                )
+                if (!state.colors.colors[state.colors.currentColor].outOfStock) {
+                    SizesControls(
+                        state = state.sizes,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp),
+                        onSizeClicked = onSizeClicked,
+                    )
+                }
                 AboutProduct(
                     description = state.description,
                     modifier = Modifier
