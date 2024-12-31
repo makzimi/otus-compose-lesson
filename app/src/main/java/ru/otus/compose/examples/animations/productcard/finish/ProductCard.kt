@@ -1,8 +1,12 @@
 package ru.otus.compose.examples.animations.productcard.finish
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
@@ -80,7 +84,11 @@ fun ProductCard(
                         .padding(horizontal = 20.dp),
                     onColorClicked = onColorClicked,
                 )
-                if (!state.colors.colors[state.colors.currentColor].outOfStock) {
+                AnimatedVisibility(
+                    visible = !state.colors.colors[state.colors.currentColor].outOfStock,
+                    enter = fadeIn(tween(300, 300)) + expandVertically(tween(300, 0)),
+                    exit = fadeOut(tween(300, 0)) + shrinkVertically(tween(300, 300)),
+                ) {
                     SizesControls(
                         state = state.sizes,
                         modifier = Modifier
@@ -257,7 +265,7 @@ fun ColorControls(
 }
 
 @Composable
-fun SizesControls(
+fun AnimatedVisibilityScope.SizesControls(
     state: SizesState,
     modifier: Modifier = Modifier,
     onSizeClicked: (Int) -> Unit = { },
@@ -269,10 +277,19 @@ fun SizesControls(
         Text(
             text = "Size: ",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .animateEnterExit(
+                    enter = slideInHorizontally(tween(300, 0)) { -40 },
+                    exit = slideOutHorizontally(tween(300, 0)) { -40 },
+                )
         )
         Row(
-            modifier = Modifier,
+            modifier = Modifier
+                .animateEnterExit(
+                    enter = slideInHorizontally(tween(300, 300)) { 40 },
+                    exit = slideOutHorizontally(tween(300, 300)) { 40 },
+                ),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             state.sizes.forEachIndexed { index, size ->
