@@ -221,10 +221,17 @@ fun ColorControls(
                 text = "Color: ",
                 style = MaterialTheme.typography.titleLarge,
             )
-            Text(
-                text = state.colors[state.currentColor].colorName,
-                style = MaterialTheme.typography.titleLarge,
-            )
+            AnimatedContent(
+                targetState = state.colors[state.currentColor].colorName,
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                }
+            ) { targetState ->
+                Text(
+                    text = targetState,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
         }
         Row(
             modifier = Modifier,
