@@ -1,5 +1,6 @@
 package ru.otus.compose.examples.animations.productcard.finish
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
@@ -11,6 +12,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,6 +57,7 @@ import ru.otus.compose.R
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ColorsState
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.SizesState
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ImagesState.ImageState
+import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ImagesState
 
 @Composable
 fun ProductCard(
@@ -74,7 +77,7 @@ fun ProductCard(
                 ),
             ) {
                 Images(
-                    image = state.images.imagesRes[state.images.currentImage],
+                    images = state.images,
                     modifier = Modifier,
                 )
                 ColorControls(
@@ -141,32 +144,45 @@ fun AboutProduct(
 
 @Composable
 fun Images(
-    image: ImageState,
+    images: ImagesState,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(image.imageRes),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .aspectRatio(1f)
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(20.dp))
-                .then(
-                    if (image.outOfStock) {
-                        Modifier.alpha(0.5f)
-                    } else {
-                        Modifier
-                    }
-                )
-        )
+        AnimatedContent(
+            targetState = images.currentImage,
+            transitionSpec = {
+                if (targetState > initialState) {
+                    slideInHorizontally { height -> height } + fadeIn() togetherWith
+                            slideOutHorizontally { height -> -height } + fadeOut()
+                } else {
+                    slideInHorizontally { height -> -height } + fadeIn() togetherWith
+                            slideOutHorizontally { height -> height } + fadeOut()
+                }
+            }
+        ) { targetState ->
+            Image(
+                painter = painterResource(images.imagesRes[targetState].imageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .aspectRatio(1f)
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(20.dp))
+                    .then(
+                        if (images.imagesRes[targetState].outOfStock) {
+                            Modifier.alpha(0.5f)
+                        } else {
+                            Modifier
+                        }
+                    )
+            )
+        }
 
         AnimatedVisibility(
-            visible = image.outOfStock,
+            visible = images.imagesRes[images.currentImage].outOfStock,
             enter = slideInVertically() + fadeIn(),
             exit = slideOutVertically() + fadeOut(),
             modifier = Modifier
