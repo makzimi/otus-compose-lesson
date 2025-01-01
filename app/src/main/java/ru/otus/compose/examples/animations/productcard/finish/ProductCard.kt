@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -319,7 +320,7 @@ fun AnimatedVisibilityScope.SizesControls(
                 Text(
                     text = size,
                     modifier = Modifier
-                        .width(48.dp)
+                        .size(48.dp)
                         .then(
                             if (index == state.currentSize) {
                                 Modifier.border(
@@ -338,9 +339,9 @@ fun AnimatedVisibilityScope.SizesControls(
                                     .clip(RoundedCornerShape(8.dp))
                             }
                         )
-                        .padding(8.dp)
+                        .wrapContentHeight()
                         .clickable { onSizeClicked(index) },
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }
