@@ -331,35 +331,79 @@ fun AnimatedVisibilityScope.SizesControls(
                     enter = slideInHorizontally(tween(300, 300)) { 40 },
                     exit = slideOutHorizontally(tween(300, 300)) { 40 },
                 ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = CenterVertically,
         ) {
             state.sizes.forEachIndexed { index, size ->
-                Text(
-                    text = size,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .then(
-                            if (index == state.currentSize) {
-                                Modifier.border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                            } else {
-                                Modifier
-                                    .alpha(0.3f)
-                                    .border(
-                                        width = 2.dp,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .clip(RoundedCornerShape(8.dp))
-                            }
-                        )
-                        .wrapContentHeight()
-                        .clickable { onSizeClicked(index) },
-                    textAlign = TextAlign.Center,
+                val selected by remember(state.currentSize) {
+                    mutableStateOf(index == state.currentSize)
+                }
+
+                val transition = updateTransition(
+                    targetState = selected,
+                    label = "SizeTransition",
                 )
+
+                val alphaAnimation by transition.animateFloat(
+                    label = "SizeTransition_alpha",
+                ) { isSelected: Boolean ->
+                    if (isSelected) 1f else 0.5f
+                }
+
+                val colorAnimation by transition.animateColor(
+                    label = "SizeTransition_color",
+                ) { isSelected ->
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.secondary
+                    }
+                }
+
+                val sizeAnimation by transition.animateDp(
+                    label = "SizeTransition_size",
+                ) { isSelected ->
+                    if (isSelected) {
+                        56.dp
+                    } else {
+                        48.dp
+                    }
+                }
+
+                val elevation by transition.animateDp(
+                    label = "SizeTransition_elevation",
+                )
+                { isSelected ->
+                    if (isSelected) 4.dp else 0.dp
+                }
+
+                val shape = remember { RoundedCornerShape(8.dp) }
+
+                Surface(
+                    modifier = Modifier,
+                    shape = shape,
+                    color = MaterialTheme.colorScheme.background,
+                    shadowElevation = elevation,
+                ) {
+                    Box(modifier = Modifier
+                        .size(sizeAnimation)
+                        .graphicsLayer {
+                            this.alpha = alphaAnimation
+                        }
+                        .border(
+                            width = 2.dp,
+                            color = colorAnimation,
+                            shape = shape,
+                        )
+                        .clickable { onSizeClicked(index) }
+                    ) {
+                        Text(
+                            text = size,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.align(Center)
+                        )
+                    }
+                }
             }
         }
     }
