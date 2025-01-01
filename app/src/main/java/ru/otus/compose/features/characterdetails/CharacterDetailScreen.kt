@@ -192,7 +192,7 @@ private fun ComicsItem(
         Image(
             painter = rememberGlidePainter(
                 request = "https://static.wikia.nocookie.net/character-power/images/8/8f/DC_Comics.png/revision/latest/scale-to-width-down/700?cb=20190203204448&path-prefix=ru",
-                fadeIn = true,
+                previewPlaceholder = R.drawable.ic_magazine,
             ),
             contentDescription = "Comics",
             modifier = Modifier
@@ -225,8 +225,7 @@ private fun BigImage(url: String) {
         Image(
             painter = rememberGlidePainter(
                 request = url,
-                fadeIn = true,
-                requestBuilder = { placeholder(R.drawable.default_image) }
+                previewPlaceholder = R.drawable.ic_face,
             ),
             contentDescription = stringResource(R.string.hero_image_description),
             contentScale = ContentScale.Crop,

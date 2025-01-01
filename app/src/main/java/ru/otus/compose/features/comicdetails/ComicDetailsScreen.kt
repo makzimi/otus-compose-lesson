@@ -167,8 +167,7 @@ private fun BigImage(url: String) {
         Image(
             painter = rememberGlidePainter(
                 request = url,
-                fadeIn = true,
-                requestBuilder = { placeholder(R.drawable.default_image) }
+                previewPlaceholder = R.drawable.ic_magazine,
             ),
             contentDescription = stringResource(R.string.hero_image_description),
             contentScale = ContentScale.Crop,

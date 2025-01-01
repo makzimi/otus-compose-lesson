@@ -72,9 +72,7 @@ private fun ItemImage(
     Image(
         painter = rememberGlidePainter(
             request = imageUrl,
-            //fadeIn = true,
-            // todo плохая идея
-            requestBuilder = { placeholder(R.drawable.default_image) }
+            previewPlaceholder = R.drawable.ic_face,
         ),
         contentDescription = stringResource(R.string.hero_image_description),
         contentScale = ContentScale.Crop,
