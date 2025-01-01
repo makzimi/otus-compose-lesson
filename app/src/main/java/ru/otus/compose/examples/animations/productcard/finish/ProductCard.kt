@@ -3,7 +3,12 @@ package ru.otus.compose.examples.animations.productcard.finish
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,10 +30,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,9 +46,11 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,7 +63,6 @@ import androidx.compose.ui.unit.dp
 import ru.otus.compose.R
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ColorsState
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.SizesState
-import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ImagesState.ImageState
 import ru.otus.compose.examples.animations.productcard.finish.ProductCardState.ImagesState
 
 @Composable
@@ -239,27 +244,38 @@ fun ColorControls(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             state.colors.forEachIndexed { index, colorState ->
+                val selected by remember(state.currentColor) {
+                    mutableStateOf(index == state.currentColor)
+                }
+
+                val sizeAnimation by animateDpAsState(
+                    targetValue = if (selected) {
+                        30.dp
+                    } else {
+                        0.dp
+                    },
+                )
+
                 Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .then(
-                            if (index == state.currentColor) {
-                                Modifier.border(
-                                    width = 2.dp,
-                                    color = if (colorState.outOfStock) {
-                                        MaterialTheme.colorScheme.error
-                                    } else {
-                                        MaterialTheme.colorScheme.primary
-                                    },
-                                    shape = CircleShape,
-                                )
-                            } else {
-                                Modifier
-                            }
-                        )
-                        .size(30.dp)
-                        .clickable { onColorClicked(index) }
+                    modifier = Modifier.size(30.dp)
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .size(sizeAnimation)
+                            .clip(CircleShape)
+                            .border(
+                                width = 2.dp,
+                                color = if (colorState.outOfStock) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                },
+                                shape = CircleShape,
+                            )
+                            .align(Center)
+                            .clickable { onColorClicked(index) }
+                    )
+
                     Spacer(
                         modifier = Modifier
                             .padding(5.dp)
