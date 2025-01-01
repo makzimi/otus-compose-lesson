@@ -326,6 +326,7 @@ fun AnimatedVisibilityScope.SizesControls(
         )
         Row(
             modifier = Modifier
+                .height(64.dp)
                 .animateEnterExit(
                     enter = slideInHorizontally(tween(300, 300)) { 40 },
                     exit = slideOutHorizontally(tween(300, 300)) { 40 },
