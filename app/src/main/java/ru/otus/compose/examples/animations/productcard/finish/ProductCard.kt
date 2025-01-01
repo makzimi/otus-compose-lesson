@@ -306,6 +306,7 @@ fun ColorControls(
                     } else {
                         0.dp
                     },
+                    animationSpec = tween(300)
                 )
 
                 Box(
