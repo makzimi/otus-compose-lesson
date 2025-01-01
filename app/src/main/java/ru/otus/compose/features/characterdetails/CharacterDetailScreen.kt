@@ -1,5 +1,8 @@
 package ru.otus.compose.features.characterdetails
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -22,9 +24,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
@@ -44,13 +48,23 @@ import kotlinx.coroutines.launch
 import ru.otus.compose.ComicsCollection
 import ru.otus.compose.R
 import ru.otus.compose.ui.common.ErrorItem
-import ru.otus.compose.ui.common.LoadingView
 import ru.otus.compose.ui.theme.AppTheme
 
+private const val COMIC_IMAGE = "https://static.wikia.nocookie.net/character-power/images/8/8f/DC_Comics.png/revision/latest/scale-to-width-down/700?cb=20190203204448&path-prefix=ru"
+
+@Immutable
+data class SharedCharacterInfo(
+    val characterId: Long,
+    val imageUrl: String,
+)
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun CharacterDetailScreen(
     navHostController: NavHostController,
-    characterId: Long,
+    sharedCharacterInfo: SharedCharacterInfo,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     viewModel: CharacterDetailsViewModel = hiltViewModel(),
 ) {
     Scaffold(
@@ -62,10 +76,12 @@ fun CharacterDetailScreen(
         },
         content = { innerPadding ->
             CharacterDetailsContent(
-                characterId = characterId,
+                sharedCharacterInfo = sharedCharacterInfo,
                 navHostController = navHostController,
                 viewModel = viewModel,
                 modifier = Modifier.padding(innerPadding),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             )
         }
     )
@@ -99,16 +115,19 @@ private fun CharacterDetailsTopBar(
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CharacterDetailsContent(
-    characterId: Long,
+    sharedCharacterInfo: SharedCharacterInfo,
     navHostController: NavHostController,
     viewModel: CharacterDetailsViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeRefreshState = rememberSwipeRefreshState(false)
-    val state: State<CharacterState> = getState(viewModel, characterId)
+    val state: State<CharacterState> = getState(viewModel, sharedCharacterInfo.characterId)
 
     SwipeRefresh(
         modifier = modifier,
@@ -116,16 +135,19 @@ private fun CharacterDetailsContent(
         onRefresh = {
             coroutineScope.launch {
                 swipeRefreshState.isRefreshing = true
-                state.unsafeMutable().value = viewModel.fetchCharacter(characterId)
+                state.unsafeMutable().value =
+                    viewModel.fetchCharacter(sharedCharacterInfo.characterId)
                 swipeRefreshState.isRefreshing = false
             }
         }
     ) {
         when (val characterState = state.value) {
-            is CharacterState.Loading -> LoadingView(modifier = Modifier.fillMaxSize())
-            is CharacterState.Data -> CharacterContent(
+            is CharacterState.Data, is CharacterState.Loading -> CharacterContent(
                 state = characterState,
-                navHostController = navHostController
+                sharedCharacterInfo = sharedCharacterInfo,
+                navHostController = navHostController,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             )
 
             is CharacterState.Error -> ErrorItem(
@@ -134,7 +156,8 @@ private fun CharacterDetailsContent(
             ) {
                 coroutineScope.launch {
                     state.unsafeMutable().value = CharacterState.Loading
-                    state.unsafeMutable().value = viewModel.fetchCharacter(characterId)
+                    state.unsafeMutable().value =
+                        viewModel.fetchCharacter(sharedCharacterInfo.characterId)
                 }
             }
         }
@@ -155,10 +178,14 @@ private fun getState(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CharacterContent(
-    state: CharacterState.Data,
+    state: CharacterState,
+    sharedCharacterInfo: SharedCharacterInfo,
     navHostController: NavHostController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -167,7 +194,11 @@ private fun CharacterContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        BigImage(url = state.imageUrl)
+        BigImage(
+            sharedCharacterInfo = sharedCharacterInfo,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
+        )
         Spacer(modifier = Modifier.height(16.dp))
         CharacterDescription(state = state)
         ComicsItem(navHostController, state)
@@ -177,79 +208,92 @@ private fun CharacterContent(
 @Composable
 private fun ComicsItem(
     navHostController: NavHostController,
-    state: CharacterState.Data
+    state: CharacterState
 ) {
-    Row(
-        modifier = Modifier
-            .padding(16.dp)
-            .clickable {
-                navHostController.navigate(
-                    ComicsCollection(comicsCollectionId = state.comicCollectionId.orEmpty())
-                )
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = rememberGlidePainter(
-                request = "https://static.wikia.nocookie.net/character-power/images/8/8f/DC_Comics.png/revision/latest/scale-to-width-down/700?cb=20190203204448&path-prefix=ru",
-                previewPlaceholder = R.drawable.ic_magazine,
-            ),
-            contentDescription = "Comics",
+    if (state is CharacterState.Data) {
+        Row(
             modifier = Modifier
-                .size(
-                    height = 64.dp,
-                    width = 84.dp
-                )
-                .padding(end = 16.dp)
-                .clip(RoundedCornerShape(6.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            text = "Watch all comics",
-            color = AppTheme.colors.text,
-            style = AppTheme.typography.textMediumBold
-        )
+                .padding(16.dp)
+                .clickable {
+                    navHostController.navigate(
+                        ComicsCollection(comicsCollectionId = state.comicCollectionId.orEmpty())
+                    )
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = rememberGlidePainter(
+                    request = COMIC_IMAGE,
+                    previewPlaceholder = R.drawable.ic_magazine,
+                ),
+                contentDescription = "Comics",
+                modifier = Modifier
+                    .size(
+                        height = 64.dp,
+                        width = 84.dp
+                    )
+                    .padding(end = 16.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Text(
+                text = "Watch all comics",
+                color = AppTheme.colors.text,
+                style = AppTheme.typography.textMediumBold
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun BigImage(url: String) {
-    Card(
-        shape = RoundedCornerShape(32.dp),
-        modifier = Modifier
-            .background(color = AppTheme.colors.card)
-            .fillMaxWidth()
-            .height(240.dp)
-            .padding(16.dp)
-    ) {
+private fun BigImage(
+    sharedCharacterInfo: SharedCharacterInfo,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+) {
+    with(sharedTransitionScope) {
         Image(
             painter = rememberGlidePainter(
-                request = url,
-                previewPlaceholder = R.drawable.ic_face,
+                request = sharedCharacterInfo.imageUrl,
             ),
             contentDescription = stringResource(R.string.hero_image_description),
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(
+                        key = "image-${sharedCharacterInfo.characterId}"
+                    ),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .fillMaxWidth()
+                .height(240.dp)
+                .padding(16.dp)
+                .clip(RoundedCornerShape(32.dp))
         )
     }
 }
 
 @Composable
-private fun CharacterDescription(state: CharacterState.Data) {
+private fun CharacterDescription(state: CharacterState) {
     Column(
         modifier = Modifier
             .background(AppTheme.colors.background)
             .padding(16.dp)
     ) {
-        Text(
-            text = state.name,
-            color = AppTheme.colors.text,
-            style = AppTheme.typography.h3
-        )
-        Text(
-            text = state.description,
-            color = AppTheme.colors.text,
-            style = AppTheme.typography.textMediumBold
-        )
+        if (state is CharacterState.Data) {
+            Text(
+                text = state.name,
+                color = AppTheme.colors.text,
+                style = AppTheme.typography.h3
+            )
+            Text(
+                text = state.description,
+                color = AppTheme.colors.text,
+                style = AppTheme.typography.textMediumBold
+            )
+        } else {
+            CircularProgressIndicator()
+        }
     }
 }

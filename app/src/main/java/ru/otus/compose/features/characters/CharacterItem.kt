@@ -1,5 +1,10 @@
 package ru.otus.compose.features.characters
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,6 +35,7 @@ import ru.otus.compose.ui.theme.ComposeLessonTheme
 
 @Immutable
 data class CharacterItemState(
+    val id: String,
     val title: String,
     val description: String,
     val imageUrl: String,
@@ -37,11 +43,14 @@ data class CharacterItemState(
     val navigationDestination: Any,
 )
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun CharacterItem(
     state: CharacterItemState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
     Card(
         colors = CardDefaults.cardColors()
@@ -59,7 +68,10 @@ fun CharacterItem(
             verticalAlignment = Alignment.Top,
         ) {
             ItemImage(
-                imageUrl = state.imageUrl
+                imageUrl = state.imageUrl,
+                id = state.id,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             )
             Column(
 
@@ -102,24 +114,35 @@ fun CharacterItem(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ItemImage(
     imageUrl: String,
+    id: String,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
-    Image(
-        painter = rememberGlidePainter(
-            request = imageUrl,
-            previewPlaceholder = R.drawable.ic_face,
-        ),
-        contentDescription = stringResource(R.string.hero_image_description),
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(16.dp))
-    )
+    with(sharedTransitionScope) {
+        Image(
+            painter = rememberGlidePainter(
+                request = imageUrl,
+                previewPlaceholder = R.drawable.ic_face,
+            ),
+            contentDescription = stringResource(R.string.hero_image_description),
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .sharedElement(
+                    sharedTransitionScope.rememberSharedContentState(key = "image-$id"),
+                    animatedVisibilityScope = animatedContentScope
+                )
+                .size(80.dp)
+                .clip(RoundedCornerShape(16.dp))
+        )
+    }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 fun CharacterItemPreview() {
@@ -127,21 +150,28 @@ fun CharacterItemPreview() {
         Surface(
             color = MaterialTheme.colorScheme.surface,
         ) {
-            CharacterItem(
-                state = CharacterItemState(
-                    title = "Deadpool",
-                    description = LoremIpsum(words = 10).values.toList().first().toString(),
-                    imageUrl = "",
-                    comicNames = persistentListOf(
-                        "Comic1",
-                        "Comic2",
-                        "Comic3",
-                    ),
-                    navigationDestination = Unit,
-                ),
-                onClick = { },
-                modifier = Modifier.padding(10.dp)
-            )
+            AnimatedContent(true) {
+                SharedTransitionLayout {
+                    CharacterItem(
+                        state = CharacterItemState(
+                            id = "1$it",
+                            title = "Deadpool",
+                            description = LoremIpsum(words = 10).values.toList().first().toString(),
+                            imageUrl = "",
+                            comicNames = persistentListOf(
+                                "Comic1",
+                                "Comic2",
+                                "Comic3",
+                            ),
+                            navigationDestination = Unit,
+                        ),
+                        onClick = { },
+                        modifier = Modifier.padding(10.dp),
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@AnimatedContent,
+                    )
+                }
+            }
         }
     }
 }

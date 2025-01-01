@@ -2,6 +2,9 @@ package ru.otus.compose.features.characters
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,10 +38,13 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ru.otus.compose.ui.theme.AppTheme
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun CharactersScreen(
     navHostController: NavHostController,
     onToggleTheme: OnThemeToggle,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     charactersViewModel: CharactersViewModel = hiltViewModel(),
 ) {
     CharactersContent(
@@ -46,15 +52,20 @@ fun CharactersScreen(
         charactersViewModel = charactersViewModel,
         onToggleTheme = onToggleTheme,
         modifier = Modifier.fillMaxSize(),
+        sharedTransitionScope = sharedTransitionScope,
+        animatedContentScope = animatedContentScope,
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 private fun CharactersContent(
     navHostController: NavHostController,
     charactersViewModel: CharactersViewModel,
     onToggleTheme: OnThemeToggle,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -65,6 +76,8 @@ private fun CharactersContent(
                 navHostController = navHostController,
                 viewModel = charactersViewModel,
                 modifier = Modifier.padding(innerPadding),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             )
         },
         containerColor = AppTheme.colors.background,
@@ -99,10 +112,13 @@ private fun CharactersTopBar(
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CharacterList(
     navHostController: NavHostController,
     viewModel: CharactersViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
 ) {
     val lazyItems: LazyPagingItems<CharacterItemState> =
@@ -126,6 +142,8 @@ private fun CharacterList(
                     onClick = {
                         navHostController.navigate(characterItem.navigationDestination)
                     },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
                 )
             }
 

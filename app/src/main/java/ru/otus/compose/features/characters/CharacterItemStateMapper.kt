@@ -7,13 +7,14 @@ import javax.inject.Inject
 class CharacterItemStateMapper @Inject constructor() {
     fun map(character: Character) : CharacterItemState {
         return CharacterItemState(
+            id = character.id.toString(),
             title = character.name,
             description = character.description,
             imageUrl = character.imageUrl,
             comicNames = character.comicNames
                 .take(3)
                 .toPersistentList(),
-            navigationDestination = ru.otus.compose.Character(character.id),
+            navigationDestination = ru.otus.compose.Character(character.id, character.imageUrl),
         )
     }
 }
