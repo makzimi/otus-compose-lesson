@@ -2,10 +2,13 @@ package ru.otus.compose.examples
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,24 +27,15 @@ fun StaggeredGrid(
     content: @Composable () -> Unit
 ) {
     Layout(
-        modifier = modifier,
+        modifier = modifier.horizontalScroll(rememberScrollState()),
         content = content
     ) { measurables, constraints ->
-
-        // Keep track of the width of each row
         val rowWidths = IntArray(rows) { 0 }
-
-        // Keep track of the max height of each row
         val rowHeights = IntArray(rows) { 0 }
 
-        // Don't constrain child views further, measure them with given constraints
-        // List of measured children
         val placeables = measurables.mapIndexed { index, measurable ->
-
-            // Measure each child
             val placeable = measurable.measure(constraints)
 
-            // Track the width and max height of each row
             val row = index % rows
             rowWidths[row] += placeable.width
             rowHeights[row] = kotlin.math.max(rowHeights[row], placeable.height)
@@ -49,24 +43,18 @@ fun StaggeredGrid(
             placeable
         }
 
-        // Grid's width is the widest row
         val width = rowWidths.maxOrNull()
             ?.coerceIn(constraints.minWidth.rangeTo(constraints.maxWidth)) ?: constraints.minWidth
 
-        // Grid's height is the sum of the tallest element of each row
-        // coerced to the height constraints
         val height = rowHeights.sumOf { it }
             .coerceIn(constraints.minHeight.rangeTo(constraints.maxHeight))
 
-        // Y of each row, based on the height accumulation of previous rows
         val rowY = IntArray(rows) { 0 }
         for (i in 1 until rows) {
             rowY[i] = rowY[i - 1] + rowHeights[i - 1]
         }
 
-        // Set the size of the parent layout
         layout(width, height) {
-            // x cord we have placed up to, per row
             val rowX = IntArray(rows) { 0 }
 
             placeables.forEachIndexed { index, placeable ->
@@ -82,21 +70,11 @@ fun StaggeredGrid(
 }
 
 
-val topics = listOf(
+private val topics = listOf(
     "Arts & Crafts", "Beauty", "Books", "Business", "Comics", "Culinary",
     "Design", "Fashion", "Film", "History", "Maths", "Music", "People", "Philosophy",
     "Religion", "Social sciences", "Technology", "TV", "Writing"
 )
-
-
-@Composable
-fun BodyContent(modifier: Modifier = Modifier) {
-    StaggeredGrid(modifier = modifier) {
-        for (topic in topics) {
-            Chip(modifier = Modifier.padding(8.dp), text = topic)
-        }
-    }
-}
 
 @Composable
 fun Chip(modifier: Modifier = Modifier, text: String) {
@@ -120,27 +98,19 @@ fun Chip(modifier: Modifier = Modifier, text: String) {
     }
 }
 
-@Preview(
-    backgroundColor = 0xF6D58F,
-    showBackground = true
-)
-@Composable
-fun JustText(){
-    Text(text = "Hi Bro")
-}
-
 @Preview
 @Composable
-fun ChipPreview() {
-    ComposeLessonTheme(true) {
-        Chip(text = "Hi there")
-    }
-}
-
-@Preview()
-@Composable
-fun LayoutsCodelabPreview() {
-    ComposeLessonTheme(true) {
-        BodyContent()
+fun StaggeredGridPreview() {
+    Surface(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
+        ComposeLessonTheme(true) {
+            StaggeredGrid(modifier = Modifier) {
+                for (topic in topics) {
+                    Chip(modifier = Modifier.padding(8.dp), text = topic)
+                }
+            }
+        }
     }
 }
