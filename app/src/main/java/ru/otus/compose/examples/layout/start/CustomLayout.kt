@@ -12,6 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.otus.compose.R
 
+/**
+ * Task:
+ *
+ * Make Layout that put items by diagonal
+ */
 @Composable
 fun CustomLayout(
     modifier: Modifier = Modifier,
