@@ -11,6 +11,7 @@ data class ProductCardState(
     val images: ImagesState,
     val colors: ColorsState,
     val sizes: SizesState,
+    val isLiked: Boolean,
 ) {
     data class ImagesState(
         val imagesRes: ImmutableList<ImageState>,

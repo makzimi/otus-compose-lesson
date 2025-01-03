@@ -77,6 +77,7 @@ fun ProductCard(
     modifier: Modifier = Modifier,
     onColorClicked: (Int) -> Unit = { },
     onSizeClicked: (Int) -> Unit = { },
+    onLiked: (Boolean) -> Unit = { },
 ) {
     Scaffold(
         modifier = modifier,
@@ -469,16 +470,20 @@ fun ProductCardPreview() {
         var selectedImage by remember { mutableIntStateOf(0) }
         var selectedColor by remember { mutableIntStateOf(0) }
         var selectedSize by remember { mutableIntStateOf(2) }
+        var isLiked by remember { mutableStateOf(false) }
 
         ProductCard(
             modifier = Modifier.fillMaxSize(),
-            state = ProductCardStateCreator.create(selectedImage, selectedColor, selectedSize),
+            state = ProductCardStateCreator.create(selectedImage, selectedColor, selectedSize, isLiked),
             onColorClicked = { newColor ->
                 selectedColor = newColor
                 selectedImage = newColor
             },
             onSizeClicked = { newSize ->
                 selectedSize = newSize
+            },
+            onLiked = { newIsLiked ->
+                isLiked = !newIsLiked
             }
         )
     }

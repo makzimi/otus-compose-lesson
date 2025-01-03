@@ -14,6 +14,7 @@ object ProductCardStateCreator {
         selectedImage: Int,
         selectedColor: Int,
         selectedSize: Int,
+        isLiked: Boolean,
     ): ProductCardState {
         return ProductCardState(
             title = "Cozy Cat Sweater",
@@ -42,7 +43,8 @@ object ProductCardStateCreator {
             sizes = SizesState(
                 sizes = persistentListOf("XS", "S", "M", "L", "XL"),
                 currentSize = selectedSize,
-            )
+            ),
+            isLiked = isLiked,
         )
     }
 }
