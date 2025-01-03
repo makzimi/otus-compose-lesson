@@ -47,6 +47,19 @@ import ru.otus.compose.examples.animations.productcard.start.ProductCardState.Im
 import ru.otus.compose.examples.animations.productcard.start.ProductCardState.ColorsState
 import ru.otus.compose.examples.animations.productcard.start.ProductCardState.SizesState
 
+/**
+ * Task:
+ * - Анимируем сообщение Out of Stock
+ * - Анимируем значок “!”
+ * - Аниминуем появиление Size Controls (пусть они выходят с разных сторон)
+ * - Анимируем смену картинок (котиков)
+ * - Анимируем имя цвета
+ * - Анимируем кружочек у выбора цвета
+ * - Анимируем size
+ * - Сделать прыгающий бейджик Discount
+ * - AnimatedImageVector. Сделать анимационную иконку лайка
+ */
+
 @Composable
 fun ProductCard(
     state: ProductCardState,
