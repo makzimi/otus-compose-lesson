@@ -15,6 +15,10 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -41,6 +45,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -54,6 +59,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
@@ -91,7 +97,9 @@ fun ProductCard(
             ) {
                 Images(
                     images = state.images,
+                    isLiked = state.isLiked,
                     modifier = Modifier,
+                    onLiked = onLiked,
                 )
                 ColorControls(
                     state = state.colors,
@@ -155,10 +163,13 @@ fun AboutProduct(
     )
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 fun Images(
     images: ImagesState,
+    isLiked: Boolean,
     modifier: Modifier = Modifier,
+    onLiked: (Boolean) -> Unit = { },
 ) {
     Box(
         modifier = modifier
@@ -222,6 +233,26 @@ fun Images(
                 .align(TopEnd)
                 .padding(top = 4.dp, end = 10.dp)
         )
+
+        IconButton(
+            modifier = Modifier
+                .align(BottomEnd)
+                .padding(horizontal = 28.dp, vertical = 8.dp)
+                .clip(CircleShape)
+                .background(color = Color.White),
+            onClick = { onLiked(isLiked) },
+        ) {
+            Icon(
+                painter = rememberAnimatedVectorPainter(
+                    animatedImageVector = AnimatedImageVector.animatedVectorResource(
+                        R.drawable.ic_like_animated
+                    ),
+                    atEnd = isLiked,
+                ),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
     }
 }
 
